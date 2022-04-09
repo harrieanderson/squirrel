@@ -1,11 +1,33 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String userIdKey = 'USERKEY';
+const String userNameKey = 'USERNAMEKEY';
+const String displayNameKey = 'USERDISPLAYNAMEKEY';
+const String userEmailKey = 'USEREMAILKEY';
+const String userProfilePicKey = 'USERPROFILEPICKEY';
+
 class SharedPreferenceHelper {
-  static String userIdKey = 'USERKEY';
-  static String userNameKey = 'USERNAMEKEY';
-  static String displayNameKey = 'USERDISPLAYNAMEKEY';
-  static String userEmailKey = 'USEREMAILKEY';
-  static String userProfilePicKey = 'USERPROFILEPICKEY';
+  static final instance = SharedPreferenceHelper._();
+
+  String? userName;
+  String? email;
+  String? userId;
+  String? displayName;
+  String? userProfileUrl;
+
+  SharedPreferenceHelper._();
+
+  factory SharedPreferenceHelper() => instance;
+
+  Future<void> initialise() async {
+    await Future.wait([
+      getUserName().then((value) => userName = value),
+      getUserEmail().then((value) => email = value),
+      getUserId().then((value) => userId = value),
+      getDisplayName().then((value) => displayName = value),
+      getUserProfileUrl().then((value) => userProfileUrl),
+    ]);
+  }
 
   Future<bool> saveUserName(String getUserName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
