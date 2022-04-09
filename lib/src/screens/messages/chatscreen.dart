@@ -1,14 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
 import 'package:squirrel/services/database.dart';
-import 'package:squirrel/src/app.dart';
 import 'package:random_string/random_string.dart';
 
 class ChatsScreen extends StatefulWidget {
@@ -19,16 +15,16 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatsScreen> {
-  String chatRoomId, messageId = '';
-  String myName, myProfilePic, myUserName, myEmail;
-  Stream messageStream;
+  late String chatRoomId, messageId = '';
+  late String myName, myProfilePic, myUserName, myEmail;
+  late Stream messageStream;
   TextEditingController messageTextEditingController = TextEditingController();
 
   getMyInfoFromSharedPreference() async {
-    myName = await SharedPreferenceHelper().getDisplayName();
-    myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
-    myUserName = await SharedPreferenceHelper().getUserName();
-    myEmail = await SharedPreferenceHelper().getUserEmail();
+    myName = (await SharedPreferenceHelper().getDisplayName())!;
+    myProfilePic = (await SharedPreferenceHelper().getUserProfileUrl())!;
+    myUserName = (await SharedPreferenceHelper().getUserName())!;
+    myEmail = (await SharedPreferenceHelper().getUserEmail())!;
 
     chatRoomId = getChatRoomIdByUsernames(widget.chatWithUsername, myUserName);
   }
@@ -80,21 +76,47 @@ class _ChatScreenState extends State<ChatsScreen> {
     }
   }
 
-  Widget chatMessages() {
-    return StreamBuilder(
-      stream: messageStream,
-      builder: (context, snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                itemCount: snapshot.data.docs.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return Text(ds["message"]);
-                })
-            : Center(child: CircularProgressIndicator());
-      },
+  Widget chatMessageTile(String message, bool sendByMe) {
+    return Row(
+      mainAxisAlignment:
+          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      children: [
+        Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                bottomRight:
+                    sendByMe ? Radius.circular(0) : Radius.circular(24),
+                topRight: Radius.circular(24),
+                bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
+              ),
+              color: Colors.blue,
+            ),
+            padding: EdgeInsets.all(16),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+            )),
+      ],
     );
   }
+
+  // Widget chatMessages() {
+  //   return StreamBuilder(
+  //     stream: messageStream,
+  //     builder: (context, snapshot) {
+  //       return snapshot.hasData
+  //           ? ListView.builder(
+  //               itemCount: snapshot.data.docs.length,
+  //               itemBuilder: (context, index) {
+  //                 DocumentSnapshot ds = snapshot.data.docs[index];
+  //                 return Text(ds["message"]);
+  //               })
+  //           : Center(child: CircularProgressIndicator());
+  //     },
+  //   );
+  // }
 
   getAndSetMessages() async {
     messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
@@ -128,12 +150,13 @@ class _ChatScreenState extends State<ChatsScreen> {
                 child: StreamBuilder<dynamic>(
                     stream: messageStream,
                     builder: (context, snapshot) {
-                      final test = snapshot.data;
                       return ListView.builder(
+                        padding: EdgeInsets.only(bottom: 5, top: 16),
                         itemCount: snapshot.data.docs.length,
                         itemBuilder: (context, index) {
                           DocumentSnapshot ds = snapshot.data.docs[index];
-                          return Text((ds['message']));
+                          return chatMessageTile(
+                              ds['message'], myUserName == ds['sendBy']);
                         },
                       );
                     }),

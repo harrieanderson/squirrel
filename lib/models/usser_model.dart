@@ -4,7 +4,11 @@ class UserModel {
   String firstName;
   String secondName;
 
-  UserModel({this.uid, this.email, this.firstName, this.secondName});
+  UserModel(
+      {required this.uid,
+      required this.email,
+      required this.firstName,
+      required this.secondName});
 
   // data from server
   factory UserModel.fromMap(map) {

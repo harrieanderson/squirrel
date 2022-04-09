@@ -6,7 +6,7 @@ import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/src/screens/home_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key key}) : super(key: key);
+  const RegistrationScreen({Key? key}) : super(key: key);
 
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
@@ -17,7 +17,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final firstNameEditingController = new TextEditingController();
+  final firstNameEditingController = TextEditingController();
   final secondNameEditingController = new TextEditingController();
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
@@ -31,7 +31,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
           RegExp regex = new RegExp(r'^.{3,}$');
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return ("First name cannot be Empty");
           }
           if (!regex.hasMatch(value)) {
@@ -40,7 +40,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return null;
         },
         onSaved: (value) {
-          firstNameEditingController.text = value;
+          firstNameEditingController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -55,13 +55,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         keyboardType: TextInputType.name,
         validator: (value) {
           RegExp regex = new RegExp(r'^.{3,}$');
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return ("Second name cannot be Empty");
           }
           return null;
         },
         onSaved: (value) {
-          secondNameEditingController.text = value;
+          secondNameEditingController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -75,7 +75,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         controller: emailEditingController,
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return ("Please enter your email");
           }
 
@@ -86,7 +86,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return null;
         },
         onSaved: (value) {
-          firstNameEditingController.text = value;
+          firstNameEditingController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -101,7 +101,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         obscureText: true,
         validator: (value) {
           RegExp regex = new RegExp(r'^.{6,}$');
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return ("Password is required for login");
           }
           if (!regex.hasMatch(value)) {
@@ -109,7 +109,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           }
         },
         onSaved: (value) {
-          firstNameEditingController.text = value;
+          firstNameEditingController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -130,7 +130,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return null;
         },
         onSaved: (value) {
-          confirmPasswordEditingController.text = value;
+          confirmPasswordEditingController.text = value!;
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
@@ -216,7 +216,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void signUp(String email, String password) async {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) => {postDetailsToFireStore()})
@@ -232,11 +232,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     // sending these values
 
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User user = _auth.currentUser;
+    User user = _auth.currentUser!;
 
-    UserModel userModel = UserModel();
+    UserModel userModel =
+        UserModel(email: '', firstName: '', secondName: '', uid: '');
 
-    userModel.email = user.email;
+    userModel.email = user.email!;
     userModel.uid = user.uid;
     userModel.firstName = firstNameEditingController.text;
     userModel.secondName = secondNameEditingController.text;
@@ -250,7 +251,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     Navigator.pushAndRemoveUntil(
         (context),
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(
+                  key: UniqueKey(),
+                )),
         (route) => false);
   }
 }

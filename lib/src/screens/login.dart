@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: emailController,
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return ("Please enter your email");
           }
 
@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
           return null;
         },
         onSaved: (value) {
-          emailController.text = value;
+          emailController.text = value!;
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // ignore: missing_return
         validator: (value) {
           RegExp regex = RegExp(r'^.{6,}$');
-          if (value.isEmpty) {
+          if (value!.isEmpty) {
             return ("Password is required for login");
           }
           if (!regex.hasMatch(value)) {
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         },
         onSaved: (value) {
-          passwordController.text = value;
+          passwordController.text = value!;
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
@@ -170,13 +170,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void signIn(String email, String password) async {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState!.validate()) {
       await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => {
                 Fluttertoast.showToast(msg: "Login Successful"),
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => HomeScreen()))
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => HomeScreen(
+                          key: UniqueKey(),
+                        )))
               })
           .catchError((e) {
         Fluttertoast.showToast(msg: e.message);

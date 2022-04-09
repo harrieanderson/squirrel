@@ -7,21 +7,22 @@ import 'package:squirrel/src/screens/login.dart';
 import './main_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key key}) : super(key: key);
+  const HomeScreen({required Key key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  User user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedInUser =
+      UserModel(email: '', firstName: '', secondName: '', uid: '');
 
   void initState() {
     super.initState();
     FirebaseFirestore.instance
         .collection('user')
-        .doc(user.uid)
+        .doc(user!.uid)
         .get()
         .then((value) {
       this.loggedInUser = UserModel.fromMap(value.data());
@@ -48,20 +49,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 150,
                   child: Image.asset('assets/prop.png', fit: BoxFit.contain),
                 ),
-                Text(
+                const Text(
                   'Welcome Back',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text('${loggedInUser.firstName} ${loggedInUser.secondName}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black54,
                       fontWeight: FontWeight.w500,
                     )),
-                Text('${loggedInUser.email}',
-                    style: TextStyle(
+                Text(loggedInUser.email,
+                    style: const TextStyle(
                       color: Colors.black54,
                       fontWeight: FontWeight.w500,
                     )),

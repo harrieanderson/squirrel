@@ -17,11 +17,11 @@ class AuthMethods {
     final FirebaseAuth _firebaseauth = FirebaseAuth.instance;
     final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-    final GoogleSignInAccount googleSignInAccount =
+    final GoogleSignInAccount? googleSignInAccount =
         await _googleSignIn.signIn();
 
     final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+        await googleSignInAccount!.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleSignInAuthentication.idToken,
@@ -30,14 +30,14 @@ class AuthMethods {
     UserCredential result =
         await _firebaseauth.signInWithCredential(credential);
 
-    User userDetails = result.user;
+    User? userDetails = result.user;
 
     // ignore: curly_braces_in_flow_control_structures
     if (result != null) {
-      SharedPreferenceHelper().saveUserEmail(userDetails.email.toString());
+      SharedPreferenceHelper().saveUserEmail(userDetails!.email.toString());
       SharedPreferenceHelper().saveUserId(userDetails.uid);
       SharedPreferenceHelper()
-          .saveUserName(userDetails.email.replaceAll("gmail.com", ""));
+          .saveUserName(userDetails.email!.replaceAll("gmail.com", ""));
       SharedPreferenceHelper();
       SharedPreferenceHelper()
           .saveDisplayName(userDetails.displayName.toString());
@@ -46,7 +46,7 @@ class AuthMethods {
 
       Map<String, dynamic> userInfoMap = {
         "email": userDetails.email,
-        "username": userDetails.email.replaceAll("@gmail.com", ""),
+        "username": userDetails.email!.replaceAll("@gmail.com", ""),
         "name": userDetails.displayName,
         "imgUrl": userDetails.photoURL
       };
@@ -54,8 +54,12 @@ class AuthMethods {
       DatabaseMethods()
           .addUserInfoToDB(userDetails.uid, userInfoMap)
           .then((value) => {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()))
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HomeScreen(
+                              key: UniqueKey(),
+                            )))
               });
     }
   }

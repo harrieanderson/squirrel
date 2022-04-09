@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GoogleMapScreen extends StatefulWidget {
-  const GoogleMapScreen({Key key}) : super(key: key);
+  const GoogleMapScreen({required Key key}) : super(key: key);
 
   @override
   _GoogleMapScreenState createState() => _GoogleMapScreenState();

@@ -68,8 +68,10 @@ class MainDrawer extends StatelessWidget {
               style: TextStyle(fontSize: 18),
             ),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => GoogleMapScreen()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GoogleMapScreen(key: UniqueKey())));
             },
           ),
           ListTile(

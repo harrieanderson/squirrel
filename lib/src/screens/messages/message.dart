@@ -7,23 +7,25 @@ import 'package:squirrel/src/screens/login.dart';
 import 'package:squirrel/src/screens/messages/chatscreen.dart';
 
 class MessagesScreen extends StatefulWidget {
+  const MessagesScreen({Key? key}) : super(key: key);
+
   @override
   _MessagesScreenState createState() => _MessagesScreenState();
 }
 
 class _MessagesScreenState extends State<MessagesScreen> {
   bool isSearching = false;
-  String myName, myProfilePic, myUserName, myEmail;
-  Stream usersStream;
+  late String myName, myProfilePic, myUserName, myEmail;
+  late Stream usersStream, chatRoomsStream;
 
   TextEditingController searchUsernameEditingController =
       TextEditingController();
 
   getMyInfoFromSharedPreference() async {
-    myName = await SharedPreferenceHelper().getDisplayName();
-    myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
-    myUserName = await SharedPreferenceHelper().getUserName();
-    myEmail = await SharedPreferenceHelper().getUserEmail();
+    myName = (await SharedPreferenceHelper().getDisplayName())!;
+    myProfilePic = (await SharedPreferenceHelper().getUserProfileUrl())!;
+    myUserName = (await SharedPreferenceHelper().getUserName())!;
+    myEmail = (await SharedPreferenceHelper().getUserEmail())!;
   }
 
   getChatRoomIdByUsernames(String a, String b) {
@@ -42,7 +44,24 @@ class _MessagesScreenState extends State<MessagesScreen> {
     setState(() {});
   }
 
-  Widget searchListUserTile({String profileUrl, name, email}) {
+  Widget chatRoomsList() {
+    return StreamBuilder<dynamic>(
+      stream: chatRoomsStream,
+      builder: (context, snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
+                itemCount: snapshot.data!.docs.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot ds = snapshot.data!.docs[index];
+                  return ChatRoomListTile(ds['lastMessage'], ds.id, myUserName);
+                })
+            : Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  Widget searchListUserTile({required String profileUrl, name, email}) {
     return GestureDetector(
       onTap: () {
         var chatRoomId = getChatRoomIdByUsernames(myUserName, name);
@@ -65,7 +84,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               width: 40,
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [Text(name), Text(email)],
@@ -76,15 +95,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   Widget searchUsersList() {
-    return StreamBuilder(
+    return StreamBuilder<dynamic>(
       stream: usersStream,
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                itemCount: snapshot.data.docs.length,
+                itemCount: snapshot.data!.docs.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
+                  DocumentSnapshot ds = snapshot.data!.docs[index];
                   return searchListUserTile(
                       profileUrl: ds['imgUrl'],
                       name: ds['name'],
@@ -98,12 +117,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
     );
   }
 
-  Widget chatRoomsList() {
-    return Container();
+  getChatRooms() async {
+    chatRoomsStream = await DatabaseMethods().getChatRooms();
+    setState(() {});
+  }
+
+  onScreenLoaded() async {
+    await getMyInfoFromSharedPreference();
+    getChatRooms();
   }
 
   void initState() {
-    getMyInfoFromSharedPreference();
+    onScreenLoaded();
     super.initState();
   }
 
@@ -177,6 +202,67 @@ class _MessagesScreenState extends State<MessagesScreen> {
               isSearching ? searchUsersList() : chatRoomsList()
             ],
           )),
+    );
+  }
+}
+
+class ChatRoomListTile extends StatefulWidget {
+  String lastMessage, chatRoomId, myUsername;
+  ChatRoomListTile(this.lastMessage, this.chatRoomId, this.myUsername,
+      {Key? key})
+      : super(key: key);
+
+  @override
+  State<ChatRoomListTile> createState() => _ChatRoomListTileState();
+}
+
+class _ChatRoomListTileState extends State<ChatRoomListTile> {
+  late String profilePicUrl = "", name = "", username = "";
+
+  getThisUserInfo() async {
+    username =
+        widget.chatRoomId.replaceAll(widget.myUsername, "").replaceAll("_", "");
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
+    name = "${querySnapshot.docs[0]['name']}";
+    profilePicUrl = "${querySnapshot.docs[0]['imgUrl']}";
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getThisUserInfo();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // SizedBox(
+        // height: 40,
+        // width: 40,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: Image.network(
+            profilePicUrl,
+            // height: 40,
+            // width: 40,
+          ),
+        ),
+
+        SizedBox(
+          width: 8,
+        ),
+        Column(
+          children: [
+            Text(
+              name,
+              style: TextStyle(fontSize: 16),
+            ),
+            Text(widget.lastMessage)
+          ],
+        ),
+      ],
     );
   }
 }

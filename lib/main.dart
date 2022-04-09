@@ -13,21 +13,19 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Email And password Login',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
       home: FutureBuilder(
           future: AuthMethods().getCurrentUser(),
           builder: (context, AsyncSnapshot<User> snapshot) {
             if (snapshot.hasData) {
-              return const HomeScreen();
+              return HomeScreen(
+                key: UniqueKey(),
+              );
             } else {
               return LoginScreen();
             }
