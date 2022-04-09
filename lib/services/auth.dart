@@ -59,13 +59,18 @@ class Authenticator {
   Future<void> _saveUserData(User user) async {
     SharedPreferenceHelper().userEmail = user.email ?? '';
     SharedPreferenceHelper().userId = user.uid;
-    SharedPreferenceHelper().userName = user.email!.replaceAll(
-      "gmail.com",
-      "",
-    ); // TODO: this might be a bad idea, replacing gmail.com - maybe better to look for @ and replace from there
+    var indexToDrop = user.email!.indexOf('@');
+    if (indexToDrop < 0) {
+      indexToDrop = user.email!.length;
+    }
+    SharedPreferenceHelper().userName = user.email!.substring(
+      0,
+      indexToDrop,
+    );
     print('user name = ${SharedPreferenceHelper().userName}');
     SharedPreferenceHelper().displayName = user.displayName ?? '';
     SharedPreferenceHelper().userProfileUrl = user.photoURL ?? '';
+    print('***** URL name = ${SharedPreferenceHelper().userProfileUrl}');
 
     Map<String, dynamic> userInfoMap = {
       "email": SharedPreferenceHelper().userEmail,
