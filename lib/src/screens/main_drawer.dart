@@ -89,7 +89,7 @@ class MainDrawer extends StatelessWidget {
                 style: TextStyle(fontSize: 18),
               ),
               onTap: () {
-                AuthMethods().signOut().then(({
+                Authenticator().signOut().then(({
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

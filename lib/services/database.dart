@@ -10,7 +10,7 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
-  Future<Stream<QuerySnapshot>> getUserByUsername(String username) async {
+  Stream<QuerySnapshot> getUserByUsername(String username) {
     return FirebaseFirestore.instance
         .collection('users')
         .where('username', isEqualTo: username)
@@ -54,8 +54,7 @@ class DatabaseMethods {
     }
   }
 
-  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> getChatRoomMessages(
-      chatRoomId) async {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getChatRoomMessages(chatRoomId) {
     return FirebaseFirestore.instance
         .collection("chatrooms")
         .doc(chatRoomId)
@@ -64,8 +63,8 @@ class DatabaseMethods {
         .snapshots();
   }
 
-  Future<Stream<QuerySnapshot>> getChatRooms() async {
-    String? myUsername = await SharedPreferenceHelper().getUserName();
+  Stream<QuerySnapshot<Map<String, dynamic>>> getChatRooms() {
+    String? myUsername = SharedPreferenceHelper().userName;
     return FirebaseFirestore.instance
         .collection("chatrooms")
         .orderBy("lastMessageSendTs", descending: true)

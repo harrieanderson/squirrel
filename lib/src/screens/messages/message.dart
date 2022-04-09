@@ -21,14 +21,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
   TextEditingController searchUsernameEditingController =
       TextEditingController();
 
-  getMyInfoFromSharedPreference() async {
-    myName = (await SharedPreferenceHelper().getDisplayName())!;
-    myProfilePic = (await SharedPreferenceHelper().getUserProfileUrl())!;
-    myUserName = (await SharedPreferenceHelper().getUserName())!;
-    myEmail = (await SharedPreferenceHelper().getUserEmail())!;
+  getMyInfoFromSharedPreference() {
+    myName = SharedPreferenceHelper().displayName;
+    myProfilePic = SharedPreferenceHelper().userProfileUrl;
+    myUserName = SharedPreferenceHelper().userName;
+    myEmail = SharedPreferenceHelper().userEmail;
   }
 
   getChatRoomIdByUsernames(String a, String b) {
+    print('a = $a, b = $b');
     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
       return "$b\_$a";
     } else {
@@ -36,17 +37,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
     }
   }
 
-  onSearchBtnClick() async {
+  void onSearchBtnClick() {
     isSearching = true;
-    setState(() {});
-    usersStream = await DatabaseMethods()
+    usersStream = DatabaseMethods()
         .getUserByUsername(searchUsernameEditingController.text);
     setState(() {});
   }
 
   Widget chatRoomsList() {
     return StreamBuilder<dynamic>(
-      stream: chatRoomsStream,
+      stream: DatabaseMethods().getChatRooms(),
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
@@ -54,7 +54,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data!.docs[index];
-                  return ChatRoomListTile(ds['lastMessage'], ds.id, myUserName);
+                  return ChatRoomListTile(
+                    ds['lastMessage'],
+                    ds.id,
+                    SharedPreferenceHelper.instance.userName,
+                  );
                 })
             : Center(child: CircularProgressIndicator());
       },
@@ -64,13 +68,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget searchListUserTile({required String profileUrl, name, email}) {
     return GestureDetector(
       onTap: () {
-        var chatRoomId = getChatRoomIdByUsernames(myUserName, name);
+        var chatRoomId = getChatRoomIdByUsernames(
+          SharedPreferenceHelper.instance.userName,
+          name,
+        );
         Map<String, dynamic> chatRoomInfoMap = {
-          "users": [myUserName, name]
+          "users": [SharedPreferenceHelper.instance.userName, name]
         };
-
         DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
-
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => ChatsScreen(name, email)));
       },
@@ -104,10 +109,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data!.docs[index];
+                  print(ds.data());
                   return searchListUserTile(
-                      profileUrl: ds['imgUrl'],
-                      name: ds['name'],
-                      email: ds['email']);
+                    profileUrl: ds['imgUrl'],
+                    name: ds['name'],
+                    email: ds['email'],
+                  );
                 },
               )
             : Center(
@@ -115,21 +122,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
               );
       },
     );
-  }
-
-  getChatRooms() async {
-    chatRoomsStream = await DatabaseMethods().getChatRooms();
-    setState(() {});
-  }
-
-  onScreenLoaded() async {
-    await getMyInfoFromSharedPreference();
-    getChatRooms();
-  }
-
-  void initState() {
-    onScreenLoaded();
-    super.initState();
   }
 
   @override
@@ -140,7 +132,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         actions: [
           InkWell(
             onTap: () {
-              AuthMethods().signOut().then((s) {
+              Authenticator().signOut().then((s) {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => LoginScreen()));
               });
@@ -208,6 +200,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
 class ChatRoomListTile extends StatefulWidget {
   String lastMessage, chatRoomId, myUsername;
+
   ChatRoomListTile(this.lastMessage, this.chatRoomId, this.myUsername,
       {Key? key})
       : super(key: key);
@@ -217,39 +210,39 @@ class ChatRoomListTile extends StatefulWidget {
 }
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
-  late String profilePicUrl = "", name = "", username = "";
+  String profilePicUrl = "", name = "", username = "";
 
   getThisUserInfo() async {
-    username =
-        widget.chatRoomId.replaceAll(widget.myUsername, "").replaceAll("_", "");
+    username = widget.chatRoomId
+        .replaceAll(SharedPreferenceHelper().userName, "")
+        .replaceAll("_", "");
     QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
     name = "${querySnapshot.docs[0]['name']}";
     profilePicUrl = "${querySnapshot.docs[0]['imgUrl']}";
-    setState(() {});
   }
 
   @override
   void initState() {
-    getThisUserInfo();
     super.initState();
+    getThisUserInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // SizedBox(
-        // height: 40,
-        // width: 40,
-        ClipRRect(
-          borderRadius: BorderRadius.circular(40),
-          child: Image.network(
-            profilePicUrl,
-            // height: 40,
-            // width: 40,
+        SizedBox(
+          height: 40,
+          width: 40,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(40),
+            child: Image.network(
+              profilePicUrl,
+              // height: 40,
+              // width: 40,
+            ),
           ),
         ),
-
         SizedBox(
           width: 8,
         ),
