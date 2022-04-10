@@ -7,7 +7,6 @@ import 'package:squirrel/services/database.dart';
 
 class Authenticator {
   final FirebaseAuth auth = FirebaseAuth.instance;
-
   User? getCurrentUser() {
     return auth.currentUser;
   }
@@ -19,22 +18,16 @@ class Authenticator {
   Future<void> signInWithGoogle(BuildContext context) async {
     final FirebaseAuth _firebaseauth = FirebaseAuth.instance;
     final GoogleSignIn _googleSignIn = GoogleSignIn();
-
     final GoogleSignInAccount? googleSignInAccount =
         await _googleSignIn.signIn();
-
     final GoogleSignInAuthentication googleSignInAuthentication =
         await googleSignInAccount!.authentication;
-
     final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken);
-
     UserCredential result =
         await _firebaseauth.signInWithCredential(credential);
-
     final user = result.user;
-
     if (user != null) {
       await _saveUserData(user);
     }
@@ -68,9 +61,8 @@ class Authenticator {
       indexToDrop,
     );
     print('user name = ${SharedPreferenceHelper().userName}');
-    SharedPreferenceHelper().displayName = user.displayName ?? '';
-    SharedPreferenceHelper().userProfileUrl = user.photoURL ?? '';
-    print('***** URL name = ${SharedPreferenceHelper().userProfileUrl}');
+    SharedPreferenceHelper().displayName = user.displayName ?? "";
+    SharedPreferenceHelper().userProfileUrl = user.photoURL ?? "";
 
     Map<String, dynamic> userInfoMap = {
       "email": SharedPreferenceHelper().userEmail,
@@ -78,8 +70,6 @@ class Authenticator {
       "name": SharedPreferenceHelper().displayName,
       "imgUrl": SharedPreferenceHelper().userProfileUrl,
     };
-
-    print(userInfoMap);
 
     await DatabaseMethods().addUserInfoToDB(user.uid, userInfoMap);
   }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:squirrel/services/auth.dart';
@@ -14,6 +15,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -143,23 +146,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: () {
                         Authenticator()
                             .signInWithGoogle(context)
-                            .then(
-                              (uid) => {
-                                Fluttertoast.showToast(msg: "Login Successful"),
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (context) => HomeScreen(
-                                      key: UniqueKey(),
+                            .then((uid) => {
+                                  Fluttertoast.showToast(
+                                      msg: "login Successful"),
+                                  Navigator.of(context)
+                                      .pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => HomeScreen(
+                                        key: UniqueKey(),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              },
-                            )
-                            .catchError(
-                          (e) {
-                            Fluttertoast.showToast(msg: e.message);
-                          },
-                        );
+                                  )
+                                      .catchError((e) {
+                                    Fluttertoast.showToast(msg: e.message);
+                                  })
+                                });
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -188,23 +189,19 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       await Authenticator()
           .signInWithEmailAndPassword(email, password)
-          .then(
-            (uid) => {
-              Fluttertoast.showToast(msg: "Login Successful"),
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => HomeScreen(
-                    key: UniqueKey(),
+          .then((uid) => {
+                Fluttertoast.showToast(msg: "Login Successful"),
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HomeScreen(
+                      key: UniqueKey(),
+                    ),
                   ),
                 ),
-              ),
-            },
-          )
-          .catchError(
-        (e) {
-          Fluttertoast.showToast(msg: e.message);
-        },
-      );
+              })
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e.message);
+      });
     }
   }
 }

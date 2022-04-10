@@ -77,32 +77,32 @@ class SharedPreferenceHelper {
 
   String get userName {
     assert(
-    _userName != null,
-    '_userName == null - forgot to call SharedPreferenceHelper.initialise()?',
+      _userName != null,
+      '_userName == null - forgot to call SharedPreferenceHelper.initialise()?',
     );
     return _userName!;
   }
 
   String get userEmail {
     assert(
-    _userEmail != null,
-    '_userEmail == null - forgot to call SharedPreferenceHelper.initialise()?',
+      _userEmail != null,
+      '_userEmail == null - forgot to call SharedPreferenceHelper.initialise()?',
     );
     return _userEmail!;
   }
 
   String get userId {
     assert(
-    _userId != null,
-    '_userId == null - forgot to call SharedPreferenceHelper.initialise()?',
+      _userId != null,
+      '_userId == null - forgot to call SharedPreferenceHelper.initialise()?',
     );
     return _userId!;
   }
 
   String get displayName {
     assert(
-    _displayName != null,
-    '_displayName == null - forgot to call SharedPreferenceHelper.initialise()?',
+      _displayName != null,
+      '_displayName == null - forgot to call SharedPreferenceHelper.initialise()?',
     );
     return _displayName!;
   }
