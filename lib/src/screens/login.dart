@@ -49,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
         autofocus: false,
         controller: passwordController,
         obscureText: true,
-        // ignore: missing_return
         validator: (value) {
           RegExp regex = RegExp(r'^.{6,}$');
           if (value!.isEmpty) {
@@ -58,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!regex.hasMatch(value)) {
             return ('Enter Valid Password (Min. 6 Characters)');
           }
+          return null;
         },
         onSaved: (value) {
           passwordController.text = value!;
@@ -144,7 +144,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        AuthMethods().signInWithGoogle(context);
+                        Authenticator()
+                            .signInWithGoogle(context)
+                            .then((uid) => {
+                                  Fluttertoast.showToast(
+                                      msg: "login Successful"),
+                                  Navigator.of(context)
+                                      .pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => HomeScreen(
+                                        key: UniqueKey(),
+                                      ),
+                                    ),
+                                  )
+                                      .catchError((e) {
+                                    Fluttertoast.showToast(msg: e.message);
+                                  })
+                                });
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -171,14 +187,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
-      await _auth
-          .signInWithEmailAndPassword(email: email, password: password)
+      await Authenticator()
+          .signInWithEmailAndPassword(email, password)
           .then((uid) => {
                 Fluttertoast.showToast(msg: "Login Successful"),
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
                     builder: (context) => HomeScreen(
-                          key: UniqueKey(),
-                        )))
+                      key: UniqueKey(),
+                    ),
+                  ),
+                ),
               })
           .catchError((e) {
         Fluttertoast.showToast(msg: e.message);

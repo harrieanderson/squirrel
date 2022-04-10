@@ -3,102 +3,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:random_string/random_string.dart';
 import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
 import 'package:squirrel/services/database.dart';
-import 'package:random_string/random_string.dart';
 
 class ChatsScreen extends StatefulWidget {
   final String chatWithUsername, name;
+
   ChatsScreen(this.chatWithUsername, this.name);
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatsScreen> {
   late String chatRoomId, messageId = '';
-  late String myName, myProfilePic, myUserName, myEmail;
-  late Stream messageStream;
   TextEditingController messageTextEditingController = TextEditingController();
 
-  getMyInfoFromSharedPreference() async {
-    myName = (await SharedPreferenceHelper().getDisplayName())!;
-    myProfilePic = (await SharedPreferenceHelper().getUserProfileUrl())!;
-    myUserName = (await SharedPreferenceHelper().getUserName())!;
-    myEmail = (await SharedPreferenceHelper().getUserEmail())!;
-
-    chatRoomId = getChatRoomIdByUsernames(widget.chatWithUsername, myUserName);
-  }
-
-  getChatRoomIdByUsernames(String a, String b) {
-    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-      return "$b\_$a";
-    } else {
-      return "$a\_$b";
-    }
-  }
-
-  addMessage(bool sendClicked) {
-    if (messageTextEditingController.text != "") {
-      String message = messageTextEditingController.text;
-
-      var lastMessageTs = DateTime.now();
-
-      Map<String, dynamic> messageInfoMap = {
-        "message": message,
-        "sendBy": myUserName,
-        "ts": lastMessageTs,
-        "imgUrl": myProfilePic
-      };
-
-      if (messageId == "") {
-        messageId = randomAlphaNumeric(12);
-      }
-
-      DatabaseMethods()
-          .addMessage(chatRoomId, messageId, messageInfoMap)
-          .then((value) {
-        Map<String, dynamic> lastMessageInfoMap = {
-          "lastMessage": message,
-          "lastMessageSendTs": lastMessageTs,
-          "lastMessageSendBy": myUserName
-        };
-
-        DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
-
-        if (sendClicked) {
-          // remove the text in the message input field
-          messageTextEditingController.text = '';
-
-          // make the message id blank to get regenerated on next message send
-          messageId = '';
-        }
-      });
-    }
-  }
-
-  Widget chatMessageTile(String message, bool sendByMe) {
-    return Row(
-      mainAxisAlignment:
-          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                bottomRight:
-                    sendByMe ? Radius.circular(0) : Radius.circular(24),
-                topRight: Radius.circular(24),
-                bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
-              ),
-              color: Colors.blue,
-            ),
-            padding: EdgeInsets.all(16),
-            child: Text(
-              message,
-              style: TextStyle(color: Colors.white),
-            )),
-      ],
+  @override
+  void initState() {
+    super.initState();
+    chatRoomId = _getChatRoomIdByUsernames(
+      widget.chatWithUsername,
+      SharedPreferenceHelper().userName,
     );
   }
 
@@ -118,22 +45,6 @@ class _ChatScreenState extends State<ChatsScreen> {
   //   );
   // }
 
-  getAndSetMessages() async {
-    messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
-    setState(() {});
-  }
-
-  doThisOnLaunch() async {
-    await getMyInfoFromSharedPreference();
-    getAndSetMessages();
-  }
-
-  @override
-  void initState() {
-    doThisOnLaunch();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -148,15 +59,17 @@ class _ChatScreenState extends State<ChatsScreen> {
             children: [
               Expanded(
                 child: StreamBuilder<dynamic>(
-                    stream: messageStream,
+                    stream: DatabaseMethods().getChatRoomMessages(chatRoomId),
                     builder: (context, snapshot) {
                       return ListView.builder(
                         padding: EdgeInsets.only(bottom: 5, top: 16),
-                        itemCount: snapshot.data.docs.length,
+                        itemCount: snapshot.data.docs?.length ?? 0,
                         itemBuilder: (context, index) {
                           DocumentSnapshot ds = snapshot.data.docs[index];
-                          return chatMessageTile(
-                              ds['message'], myUserName == ds['sendBy']);
+                          return _chatMessageTile(
+                            ds['message'],
+                            SharedPreferenceHelper().userName == ds['sendBy'],
+                          );
                         },
                       );
                     }),
@@ -184,7 +97,7 @@ class _ChatScreenState extends State<ChatsScreen> {
                                 child: TextField(
                               controller: messageTextEditingController,
                               onChanged: (value) {
-                                addMessage(false);
+                                _addMessage(false);
                               },
                               decoration: InputDecoration(
                                   hintText: 'Send a message',
@@ -192,7 +105,7 @@ class _ChatScreenState extends State<ChatsScreen> {
                             )),
                             GestureDetector(
                               onTap: () {
-                                addMessage(true);
+                                _addMessage(true);
                               },
                               child: Icon(
                                 Icons.send,
@@ -216,5 +129,78 @@ class _ChatScreenState extends State<ChatsScreen> {
         ),
       ),
     );
+  }
+
+  Widget _chatMessageTile(String message, bool sendByMe) {
+    return Row(
+      mainAxisAlignment:
+          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      children: [
+        Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                bottomRight:
+                    sendByMe ? Radius.circular(0) : Radius.circular(24),
+                topRight: Radius.circular(24),
+                bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
+              ),
+              color: Colors.blue,
+            ),
+            padding: EdgeInsets.all(16),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+            )),
+      ],
+    );
+  }
+
+  _getChatRoomIdByUsernames(String a, String b) {
+    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+      return "$b\_$a";
+    } else {
+      return "$a\_$b";
+    }
+  }
+
+  _addMessage(bool sendClicked) {
+    if (messageTextEditingController.text != "") {
+      String message = messageTextEditingController.text;
+
+      var lastMessageTs = DateTime.now();
+
+      Map<String, dynamic> messageInfoMap = {
+        "message": message,
+        "sendBy": SharedPreferenceHelper().userName,
+        "ts": lastMessageTs,
+        "imgUrl": SharedPreferenceHelper().userProfileUrl
+      };
+
+      if (messageId == "") {
+        messageId = randomAlphaNumeric(12);
+      }
+
+      DatabaseMethods()
+          .addMessage(chatRoomId, messageId, messageInfoMap)
+          .then((value) {
+        Map<String, dynamic> lastMessageInfoMap = {
+          "lastMessage": message,
+          "lastMessageSendTs": lastMessageTs,
+          "lastMessageSendBy": SharedPreferenceHelper().userName
+        };
+
+        DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
+
+        if (sendClicked) {
+          // remove the text in the message input field
+          messageTextEditingController.text = '';
+
+          // make the message id blank to get regenerated on next message send
+          messageId = '';
+        }
+      });
+    }
   }
 }

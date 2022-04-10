@@ -21,11 +21,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
   TextEditingController searchUsernameEditingController =
       TextEditingController();
 
-  getMyInfoFromSharedPreference() async {
-    myName = (await SharedPreferenceHelper().getDisplayName())!;
-    myProfilePic = (await SharedPreferenceHelper().getUserProfileUrl())!;
-    myUserName = (await SharedPreferenceHelper().getUserName())!;
-    myEmail = (await SharedPreferenceHelper().getUserEmail())!;
+  getMyInfoFromSharedPreference() {
+    myName = SharedPreferenceHelper().displayName;
+    myProfilePic = SharedPreferenceHelper().userProfileUrl;
+    myUserName = SharedPreferenceHelper().userName;
+    myEmail = SharedPreferenceHelper().userEmail;
   }
 
   getChatRoomIdByUsernames(String a, String b) {
@@ -46,11 +46,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   Widget chatRoomsList() {
     return StreamBuilder<dynamic>(
-      stream: chatRoomsStream,
+      stream: DatabaseMethods().getChatRooms(),
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                itemCount: snapshot.data!.docs.length,
+                itemCount: 1,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data!.docs[index];
@@ -119,7 +119,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   getChatRooms() async {
     chatRoomsStream = await DatabaseMethods().getChatRooms();
-    setState(() {});
   }
 
   onScreenLoaded() async {
@@ -140,7 +139,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         actions: [
           InkWell(
             onTap: () {
-              AuthMethods().signOut().then((s) {
+              Authenticator().signOut().then((s) {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => LoginScreen()));
               });
@@ -189,8 +188,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           )),
                           GestureDetector(
                               onTap: () {
-                                if (searchUsernameEditingController.text != "")
+                                if (searchUsernameEditingController.text !=
+                                    "") {
                                   onSearchBtnClick();
+                                }
                               },
                               child: Icon(Icons.search))
                         ],
@@ -217,7 +218,7 @@ class ChatRoomListTile extends StatefulWidget {
 }
 
 class _ChatRoomListTileState extends State<ChatRoomListTile> {
-  late String profilePicUrl = "", name = "", username = "";
+  String profilePicUrl = "", name = "", username = "";
 
   getThisUserInfo() async {
     username =
@@ -239,17 +240,16 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     return Row(
       children: [
         // SizedBox(
-        // height: 40,
-        // width: 40,
+        //   height: 40,
+        //   width: 40,
         ClipRRect(
           borderRadius: BorderRadius.circular(40),
           child: Image.network(
             profilePicUrl,
-            // height: 40,
-            // width: 40,
+            height: 40,
+            width: 40,
           ),
         ),
-
         SizedBox(
           width: 8,
         ),
