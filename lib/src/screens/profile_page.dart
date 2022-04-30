@@ -29,7 +29,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                   Stack(children: <Widget>[
                     CircleAvatar(
                       backgroundImage: NetworkImage(
-                          'https://scontent.flba3-1.fna.fbcdn.net/v/t39.30808-6/272059473_10224041200571270_2474966297877769639_n.jpg?_nc_cat=104&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=AeuS5nrNF-sAX9R2lP1&tn=IAl5phUutYdnzHba&_nc_ht=scontent.flba3-1.fna&oh=00_AT-J0WdrPJXysvsyjVxpd6KtLgqPhbnLCKwvEcbZ4le_Dw&oe=61E9FEE0'),
+                          'https://scontent.flba3-1.fna.fbcdn.net/v/t39.30808-6/272059473_10224041200571270_2474966297877769639_n.jpg?_nc_cat=104&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=3UUeIYeWmlYAX-gmRhV&tn=IAl5phUutYdnzHba&_nc_ht=scontent.flba3-1.fna&oh=00_AT__xgdudmccvI83lDU9pNSxDXkqMUACHEuDfHv_Bny9Sw&oe=625EABA0'),
                       radius: 50,
                     ),
                     Positioned(
@@ -99,9 +99,9 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                     leading: Icon(Icons.location_on),
                   ),
                   ListTile(
-                    title: Text('Email'),
-                    subtitle: Text('HarrieAnd@Outlook.com'),
-                    leading: Icon(Icons.email),
+                    title: Text('Total culls'),
+                    subtitle: Text('15'),
+                    leading: Icon(Icons.gps_fixed_rounded),
                   ),
                   ListTile(
                     title: Text('Phone'),
