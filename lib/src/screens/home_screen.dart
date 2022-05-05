@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/src/screens/login.dart';
+import 'package:squirrel/src/screens/messages/message.dart';
+import 'package:squirrel/src/screens/nav_bar.dart';
+import 'package:squirrel/src/screens/profile_page.dart';
 import './main_drawer.dart';
+import 'google_map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({required Key key}) : super(key: key);
@@ -30,6 +34,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  int index = 0;
+
+  final pages = <Widget>[
+    HomeScreen(
+      key: UniqueKey(),
+    ),
+    GoogleMapScreen(
+      key: UniqueKey(),
+    ),
+    MessagesScreen(),
+    ProfilePageUi(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +54,15 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home'),
         centerTitle: true,
       ),
-      bottomNavigationBar: MainDrawer(),
+      bottomNavigationBar: MainDrawer(
+        index: index,
+        onChangedTab: onChangedTab,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {},
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: Column(
         children: [
           Padding(
@@ -50,5 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  void onChangedTab(int index) {
+    setState(() {
+      this.index = index;
+    });
   }
 }
