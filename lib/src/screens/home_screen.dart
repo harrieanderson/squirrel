@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,24 +13,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel(
-    email: '',
-    firstName: '',
-    secondName: '',
-    uid: '',
-  );
+  var loggedInUserFuture;
 
   @override
   void initState() {
     super.initState();
-    //FirebaseFirestore.instance
-    //    .collection('users')
-    //    .doc(user!.uid)
-    //    .get()
-    //    .then((value) {
-    //  loggedInUser = UserModel.fromMap(value.data());
-    //  setState(() {});
-    //});
+    final loggedInUserFuture =
+        FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
   }
 
   @override
@@ -39,14 +29,31 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home'),
         centerTitle: true,
       ),
-      //bottomNavigationBar: Container(),
-      body: Center(
-        child: Text(
-          'Home screen',
-          style: TextStyle(fontSize: 40),
-        ),
+      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: loggedInUserFuture,
+        builder: (context, snapshot) {
+          final documentSnapshot = snapshot.data;
+          UserModel? user;
+          if (documentSnapshot != null) {
+            user = UserModel.fromMap(snapshot.data!.data());
+          }
+          print('user: $user');
+
+          return Center(
+            child: Column(
+              children: [
+                Text(
+                  'Home screen',
+                  style: TextStyle(fontSize: 40),
+                ),
+                Text(
+                  user?.firstName ?? '(user is null)',
+                ),
+              ],
+            ),
+          );
+        },
       ),
-      // bottomNavigationBar: NavBar(),
     );
   }
 }
