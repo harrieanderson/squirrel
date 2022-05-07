@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home'),
         centerTitle: true,
       ),
+      body: pages[index],
       bottomNavigationBar: MainDrawer(
         index: index,
         onChangedTab: onChangedTab,
@@ -63,17 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {},
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(10),
-          ),
-          TextField(
-            textAlign: TextAlign.center,
-            decoration: InputDecoration.collapsed(hintText: 'Make a post'),
-          )
-        ],
-      ),
     );
   }
 
