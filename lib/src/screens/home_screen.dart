@@ -1,14 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:squirrel/models/usser_model.dart';
-import 'package:squirrel/src/screens/login.dart';
-import 'package:squirrel/src/screens/messages/message.dart';
-import 'package:squirrel/src/screens/nav_bar.dart';
-import 'package:squirrel/src/screens/profile_page.dart';
-import './main_drawer.dart';
-import 'google_map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({required Key key}) : super(key: key);
@@ -19,19 +12,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser =
-      UserModel(email: '', firstName: '', secondName: '', uid: '');
+  UserModel loggedInUser = UserModel(
+    email: '',
+    firstName: '',
+    secondName: '',
+    uid: '',
+  );
 
+  @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
+    //FirebaseFirestore.instance
+    //    .collection('users')
+    //    .doc(user!.uid)
+    //    .get()
+    //    .then((value) {
+    //  loggedInUser = UserModel.fromMap(value.data());
+    //  setState(() {});
+    //});
   }
 
   @override
@@ -41,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home'),
         centerTitle: true,
       ),
-      bottomNavigationBar: NavBar(),
+      //bottomNavigationBar: Container(),
       body: Center(
         child: Text(
           'Home screen',
