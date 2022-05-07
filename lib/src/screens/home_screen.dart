@@ -34,19 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  int index = 0;
-
-  final pages = <Widget>[
-    HomeScreen(
-      key: UniqueKey(),
-    ),
-    GoogleMapScreen(
-      key: UniqueKey(),
-    ),
-    MessagesScreen(),
-    ProfilePageUi(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,22 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home'),
         centerTitle: true,
       ),
-      body: pages[index],
-      bottomNavigationBar: MainDrawer(
-        index: index,
-        onChangedTab: onChangedTab,
+      bottomNavigationBar: NavBar(),
+      body: Center(
+        child: Text(
+          'Home screen',
+          style: TextStyle(fontSize: 40),
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {},
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // bottomNavigationBar: NavBar(),
     );
-  }
-
-  void onChangedTab(int index) {
-    setState(() {
-      this.index = index;
-    });
   }
 }
