@@ -13,14 +13,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? user = FirebaseAuth.instance.currentUser;
-  var loggedInUserFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    final loggedInUserFuture =
-        FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
-  }
+  late Future<DocumentSnapshot<Map<String, dynamic>>> loggedInUserFuture =
+      FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (documentSnapshot != null) {
             user = UserModel.fromMap(snapshot.data!.data());
           }
-          print('user: $user');
+          print('user: ${user?.firstName}');
 
           return Center(
             child: Column(
@@ -47,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(fontSize: 40),
                 ),
                 Text(
-                  user?.firstName ?? '(user is null)',
+                  user.toString(),
                 ),
               ],
             ),

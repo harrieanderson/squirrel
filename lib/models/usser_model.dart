@@ -30,4 +30,9 @@ class UserModel {
       'secondName': secondName,
     };
   }
+
+  @override
+  String toString() {
+    return 'UserModel{uid: $uid, email: $email, firstName: $firstName, secondName: $secondName}';
+  }
 }
