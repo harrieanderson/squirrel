@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (documentSnapshot != null) {
             user = UserModel.fromMap(snapshot.data!.data());
           }
-          print('user: ${user?.firstName}');
+          print('user: ${user?.toString()}');
 
           return Center(
             child: Column(
