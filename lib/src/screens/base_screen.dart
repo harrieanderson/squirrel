@@ -5,7 +5,9 @@ import 'google_map_screen.dart';
 import 'home_screen.dart';
 
 class BaseScreen extends StatefulWidget {
-  const BaseScreen({Key? key}) : super(key: key);
+  final FloatingActionButton? floatingActionButton;
+
+  const BaseScreen({Key? key, this.floatingActionButton}) : super(key: key);
 
   @override
   State<BaseScreen> createState() => _BaseScreenState();
@@ -34,10 +36,12 @@ class _BaseScreenState extends State<BaseScreen> {
         children: screens,
         index: currentIndex,
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {},
-      ),
+      floatingActionButton: currentIndex == 0
+          ? FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: () {},
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
