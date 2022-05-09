@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Home'),
         centerTitle: true,
       ),
-      bottomNavigationBar: NavBar(),
+      // bottomNavigationBar: MainDrawer(),
       body: Center(
         child: Text(
           'Home screen',

@@ -5,58 +5,58 @@ import 'package:squirrel/src/screens/messages/message.dart';
 import 'package:squirrel/src/screens/profile_page.dart';
 
 class MainDrawer extends StatefulWidget {
-  final int index;
-  final ValueChanged<int> onChangedTab;
-
-  const MainDrawer({
-    required this.index,
-    required this.onChangedTab,
-    Key? key,
-  }) : super(key: key);
+  final FloatingActionButton? floatingActionButton;
+  const MainDrawer({Key? key, this.floatingActionButton}) : super(key: key);
 
   @override
   State<MainDrawer> createState() => _MainDrawerState();
 }
 
 class _MainDrawerState extends State<MainDrawer> {
+  int currentIndex = 0;
+  final List<Widget> screens = [
+    HomeScreen(key: UniqueKey()),
+    GoogleMapScreen(key: UniqueKey()),
+    MessagesScreen(),
+    ProfilePageUi(),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final placeholder = Opacity(
-      opacity: 0,
-      child: IconButton(icon: Icon(Icons.no_cell), onPressed: null),
-    );
-    return BottomAppBar(
-      shape: CircularNotchedRectangle(),
-      notchMargin: 3,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          buildTabItem(
-            index: 0,
-            icon: Icon(
-              Icons.home,
+    return Scaffold(
+      body: IndexedStack(
+        children: screens,
+        index: currentIndex,
+      ),
+      floatingActionButton: currentIndex == 0
+          ? FloatingActionButton(child: Icon(Icons.add), onPressed: () {})
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            buildTabItem(
+              index: 0,
+              icon: Icon(
+                Icons.home,
+              ),
             ),
-          ),
-          buildTabItem(
-            index: 1,
-            icon: Icon(
-              Icons.fmd_good_sharp,
+            buildTabItem(
+              index: 1,
+              icon: Icon(
+                Icons.fmd_good_sharp,
+              ),
             ),
-          ),
-          placeholder,
-          buildTabItem(
-            index: 2,
-            icon: Icon(
-              Icons.sms,
+            buildTabItem(
+              index: 3,
+              icon: Icon(
+                Icons.person,
+              ),
             ),
-          ),
-          buildTabItem(
-            index: 3,
-            icon: Icon(
-              Icons.person,
-            ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -65,16 +65,17 @@ class _MainDrawerState extends State<MainDrawer> {
     required int index,
     required Icon icon,
   }) {
-    final isSelected = index == widget.index;
+    final isSelected = index == currentIndex;
 
     return IconTheme(
       data: IconThemeData(
         color: isSelected ? Colors.red : Colors.black,
       ),
       child: IconButton(
-        icon: icon,
-        onPressed: () => widget.onChangedTab(index),
-      ),
+          icon: icon,
+          onPressed: () => setState(
+                () => currentIndex = index,
+              )),
     );
   }
 }
