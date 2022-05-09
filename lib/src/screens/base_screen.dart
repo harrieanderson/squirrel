@@ -16,17 +16,21 @@ class BaseScreen extends StatefulWidget {
 class _BaseScreenState extends State<BaseScreen> {
   int currentIndex = 0;
   final List<Widget> screens = [
-    HomeScreen(
-      key: UniqueKey(),
-    ),
-    GoogleMapScreen(
-      key: UniqueKey(),
-    ),
-    GoogleMapScreen(
-      key: UniqueKey(),
-    ),
-    //MessagesScreen(),
-    ProfilePageUi(),
+    Center(child: Text('Screen 1')),
+    Center(child: Text('Screen 2')),
+    Center(child: Text('Screen 3')),
+    Center(child: Text('Screen 4')),
+    // HomeScreen(
+    //   key: UniqueKey(),
+    // ),
+    // GoogleMapScreen(
+    //   key: UniqueKey(),
+    // ),
+    // GoogleMapScreen(
+    //   key: UniqueKey(),
+    // ),
+    // //MessagesScreen(),
+    // ProfilePageUi(),
   ];
 
   @override
