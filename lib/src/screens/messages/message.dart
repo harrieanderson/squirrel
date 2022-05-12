@@ -135,6 +135,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
         title: Text('Messages'),
         actions: [
           InkWell(
@@ -224,6 +226,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     username =
         widget.chatRoomId.replaceAll(widget.myUsername, "").replaceAll("_", "");
     QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
+    print(querySnapshot.size);
     name = "${querySnapshot.docs[0]['name']}";
     profilePicUrl = "${querySnapshot.docs[0]['imgUrl']}";
     setState(() {});
@@ -252,13 +255,18 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(30),
-            child: Image.network(
-              profilePicUrl,
-              height: 30,
-              width: 30,
-              fit: BoxFit.cover,
+            child: Container(
+              height: 40,
+              width: 40,
+              color: Colors.red,
             ),
+            // child: Image.network(
+            // profilePicUrl,
+            // height: 30,
+            // width: 30,
+            // fit: BoxFit.cover,
           ),
+          // ),
           SizedBox(
             width: 12,
           ),

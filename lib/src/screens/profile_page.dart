@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 import 'package:squirrel/src/app.dart';
 
@@ -13,6 +15,8 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text('Profile page'),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.red,
         elevation: 0,
       ),
@@ -23,7 +27,9 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
             height: MediaQuery.of(context).size.height * 0.3,
             width: double.infinity,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(
+                8.0,
+              ),
               child: Column(
                 children: <Widget>[
                   Stack(children: <Widget>[
@@ -33,13 +39,14 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                       radius: 50,
                     ),
                     Positioned(
-                        bottom: 3,
-                        right: 2,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 15,
-                          child: Icon(Icons.edit),
-                        ))
+                      bottom: 3,
+                      right: 2,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 15,
+                        child: Icon(Icons.edit),
+                      ),
+                    ),
                   ]),
                   SizedBox(
                     height: 10,

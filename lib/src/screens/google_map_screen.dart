@@ -13,8 +13,10 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Colors.indigo,
-          title: const Text('Google Map'),
+          title: const Text('Google Maps'),
+          centerTitle: true,
         ),
         body: Column(
           children: <Widget>[
