@@ -1,5 +1,10 @@
+import 'dart:ffi';
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
@@ -7,6 +12,39 @@ import 'package:squirrel/services/database.dart';
 
 class Authenticator {
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<String> signUpUser(
+      {required String email,
+      required String password,
+      required String username,
+      required String bio,
+      Uint8List? file}) async {
+    String res = "An error occured";
+
+    try {
+      if (email.isNotEmpty || password.isNotEmpty || username.isNotEmpty) {
+        // register user
+        UserCredential cred = await auth.createUserWithEmailAndPassword(
+            email: email, password: password);
+
+        // add user to our database
+        await firestore.collection('users').doc(cred.user!.uid).set({
+          'username': username,
+          'uid': cred.user?.uid,
+          'email': email,
+          'bio': bio,
+          'friends': [],
+          'culls': 0
+        });
+        res = 'success';
+      }
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
   User? getCurrentUser() {
     return auth.currentUser;
   }

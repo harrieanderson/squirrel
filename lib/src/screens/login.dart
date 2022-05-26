@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:squirrel/services/auth.dart';
 import 'package:squirrel/src/screens/home_screen.dart';
+import 'package:squirrel/src/screens/navigation_screen.dart';
 import 'package:squirrel/src/screens/registration_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,77 +16,85 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController bioEditingController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
 
   final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     final emailField = TextFormField(
-        autofocus: false,
-        controller: emailController,
-        keyboardType: TextInputType.emailAddress,
-        validator: (value) {
-          if (value!.isEmpty) {
-            return ("Please enter your email");
-          }
+      autofocus: false,
+      controller: emailController,
+      keyboardType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return ("Please enter your email");
+        }
 
-          if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
-              .hasMatch(value)) {
-            return ('Please Enter a valid email');
-          }
-          return null;
-        },
-        onSaved: (value) {
-          emailController.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-            prefixIcon: Icon(Icons.mail),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-            hintText: 'Email',
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(10))));
+        if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
+          return ('Please Enter a valid email');
+        }
+        return null;
+      },
+      onSaved: (value) {
+        emailController.text = value!;
+      },
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        prefixIcon: Icon(Icons.mail),
+        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        hintText: 'Email',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
     final passwordField = TextFormField(
-        autofocus: false,
-        controller: passwordController,
-        obscureText: true,
-        validator: (value) {
-          RegExp regex = RegExp(r'^.{6,}$');
-          if (value!.isEmpty) {
-            return ("Password is required for login");
-          }
-          if (!regex.hasMatch(value)) {
-            return ('Enter Valid Password (Min. 6 Characters)');
-          }
-          return null;
-        },
-        onSaved: (value) {
-          passwordController.text = value!;
-        },
-        textInputAction: TextInputAction.done,
-        decoration: InputDecoration(
-            prefixIcon: Icon(Icons.vpn_key),
-            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-            hintText: 'Password',
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(10))));
+      autofocus: false,
+      controller: passwordController,
+      obscureText: true,
+      validator: (value) {
+        RegExp regex = RegExp(r'^.{6,}$');
+        if (value!.isEmpty) {
+          return ("Password is required for login");
+        }
+        if (!regex.hasMatch(value)) {
+          return ('Enter Valid Password (Min. 6 Characters)');
+        }
+        return null;
+      },
+      onSaved: (value) {
+        passwordController.text = value!;
+      },
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+        prefixIcon: Icon(Icons.vpn_key),
+        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        hintText: 'Password',
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
 
     final loginButton = Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
       color: Colors.redAccent,
       child: MaterialButton(
-          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-          minWidth: MediaQuery.of(context).size.width,
-          onPressed: () {
-            signIn(emailController.text, passwordController.text);
-          },
-          child: Text(
-            'Login',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-          )),
+        padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {
+          signIn(emailController.text, passwordController.text);
+        },
+        child: Text(
+          'Login',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
     return Scaffold(
       backgroundColor: Colors.white,
@@ -124,10 +133,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        RegistrationScreen()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RegistrationScreen(),
+                              ),
+                            );
                           },
                           child: Text(
                             'SignUp',
@@ -174,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -193,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Fluttertoast.showToast(msg: "Login Successful"),
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => HomeScreen(
+                    builder: (context) => NavigationScreen(
                       key: UniqueKey(),
                     ),
                   ),

@@ -86,23 +86,25 @@ class _ChatScreenState extends State<ChatsScreen> {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 20 * 0.75),
                         decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(40)),
+                          color: Colors.green.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(40),
+                        ),
                         child: Row(
                           children: [
                             SizedBox(
                               width: 20 / 4,
                             ),
                             Expanded(
-                                child: TextField(
-                              controller: messageTextEditingController,
-                              onChanged: (value) {
-                                _addMessage(false);
-                              },
-                              decoration: InputDecoration(
-                                  hintText: 'Send a message',
-                                  border: InputBorder.none),
-                            )),
+                              child: TextField(
+                                controller: messageTextEditingController,
+                                onChanged: (value) {
+                                  _addMessage(false);
+                                },
+                                decoration: InputDecoration(
+                                    hintText: 'Send a message',
+                                    border: InputBorder.none),
+                              ),
+                            ),
                             GestureDetector(
                               onTap: () {
                                 _addMessage(true);
@@ -137,22 +139,22 @@ class _ChatScreenState extends State<ChatsScreen> {
           sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                bottomRight:
-                    sendByMe ? Radius.circular(0) : Radius.circular(24),
-                topRight: Radius.circular(24),
-                bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
-              ),
-              color: Colors.blue,
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              bottomRight: sendByMe ? Radius.circular(0) : Radius.circular(24),
+              topRight: Radius.circular(24),
+              bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
             ),
-            padding: EdgeInsets.all(16),
-            child: Text(
-              message,
-              style: TextStyle(color: Colors.white),
-            )),
+            color: Colors.blue,
+          ),
+          padding: EdgeInsets.all(16),
+          child: Text(
+            message,
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ],
     );
   }

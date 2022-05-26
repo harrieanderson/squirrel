@@ -18,7 +18,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
   var current_index = 0;
   final screens = [
     HomeScreen(),
-    GoogleMapScreen(key: UniqueKey()),
+    GoogleMapScreen(
+      key: UniqueKey(),
+    ),
     MessagesScreen(),
     ProfilePageUi(),
   ];

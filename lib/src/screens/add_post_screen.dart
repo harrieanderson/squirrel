@@ -38,7 +38,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       body: Column(
         children: [
           TextField(
-            decoration: InputDecoration(hintText: 'Make a post'),
+            decoration: InputDecoration(hintText: "What's happening?"),
           ),
         ],
       ),

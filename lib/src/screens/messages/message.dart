@@ -147,64 +147,67 @@ class _MessagesScreenState extends State<MessagesScreen> {
               });
             },
             child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(Icons.exit_to_app)),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Icon(Icons.exit_to_app),
+            ),
           )
         ],
       ),
       body: Container(
-          margin: EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  isSearching
-                      ? GestureDetector(
-                          onTap: () {
-                            isSearching = false;
-                            searchUsernameEditingController.text = "";
-                            setState(() {});
-                          },
-                          child: Padding(
-                              padding: EdgeInsets.only(right: 12),
-                              child: Icon(Icons.arrow_back)),
-                        )
-                      : Container(),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 16),
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.grey,
-                              width: 1,
-                              style: BorderStyle.solid),
-                          borderRadius: BorderRadius.circular(24)),
-                      child: Row(
-                        children: [
-                          Expanded(
-                              child: TextField(
-                            controller: searchUsernameEditingController,
-                            decoration: InputDecoration(
-                                border: InputBorder.none, hintText: "username"),
-                          )),
-                          GestureDetector(
-                              onTap: () {
-                                if (searchUsernameEditingController.text !=
-                                    "") {
-                                  onSearchBtnClick();
-                                }
-                              },
-                              child: Icon(Icons.search))
-                        ],
-                      ),
+        margin: EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                isSearching
+                    ? GestureDetector(
+                        onTap: () {
+                          isSearching = false;
+                          searchUsernameEditingController.text = "";
+                          setState(() {});
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: Icon(Icons.arrow_back),
+                        ),
+                      )
+                    : Container(),
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Colors.grey,
+                          width: 1,
+                          style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: TextField(
+                          controller: searchUsernameEditingController,
+                          decoration: InputDecoration(
+                              border: InputBorder.none, hintText: "username"),
+                        )),
+                        GestureDetector(
+                            onTap: () {
+                              if (searchUsernameEditingController.text != "") {
+                                onSearchBtnClick();
+                              }
+                            },
+                            child: Icon(Icons.search))
+                      ],
                     ),
                   ),
-                ],
-              ),
-              isSearching ? searchUsersList() : chatRoomsList()
-            ],
-          )),
+                ),
+              ],
+            ),
+            isSearching ? searchUsersList() : chatRoomsList()
+          ],
+        ),
+      ),
     );
   }
 }
@@ -243,28 +246,21 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChatsScreen(username, name)));
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatsScreen(username, name),
+          ),
+        );
       },
       child: Row(
         children: [
-          SizedBox(
-            height: 40,
-            width: 40,
-          ),
           ClipRRect(
             borderRadius: BorderRadius.circular(30),
-            child: Container(
+            child: Image.network(
+              profilePicUrl,
               height: 40,
               width: 40,
-              color: Colors.red,
             ),
-            // child: Image.network(
-            // profilePicUrl,
-            // height: 30,
-            // width: 30,
-            // fit: BoxFit.cover,
           ),
           // ),
           SizedBox(

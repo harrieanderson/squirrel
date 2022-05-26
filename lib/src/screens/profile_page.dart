@@ -1,6 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:developer';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:flutter/material.dart';
+import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
 import 'package:squirrel/src/app.dart';
 
 class ProfilePageUi extends StatefulWidget {
@@ -52,7 +56,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                     height: 10,
                   ),
                   Text(
-                    'Harrie Anderson',
+                    SharedPreferenceHelper().userName,
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
