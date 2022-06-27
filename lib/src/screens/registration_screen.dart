@@ -1,10 +1,15 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/services/auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:squirrel/src/screens/home_screen.dart';
+import 'package:squirrel/src/screens/navigation_screen.dart';
+import 'package:squirrel/utils/utils.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -18,28 +23,44 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final firstNameEditingController = TextEditingController();
-  final secondNameEditingController = new TextEditingController();
+  final _firstNameEditingController = TextEditingController();
+  final _secondNameEditingController = new TextEditingController();
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
   final confirmPasswordEditingController = new TextEditingController();
   final bioEditingController = new TextEditingController();
+  bool _isLoading = false;
+  Uint8List? _image;
 
   @override
   void dispose() {
     super.dispose();
-    firstNameEditingController.dispose();
-    secondNameEditingController.dispose();
+    _firstNameEditingController.dispose();
+    _secondNameEditingController.dispose();
     emailEditingController.dispose();
     passwordEditingController.dispose();
     confirmPasswordEditingController.dispose();
     bioEditingController.dispose();
   }
 
+  @override
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
+  }
+
+  void signUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+  }
+
   Widget build(BuildContext context) {
     final firstNameField = TextFormField(
       autofocus: false,
-      controller: firstNameEditingController,
+      controller: _firstNameEditingController,
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         RegExp regex = new RegExp(r'^.{3,}$');
@@ -52,7 +73,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         return null;
       },
       onSaved: (value) {
-        firstNameEditingController.text = value!;
+        _firstNameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -66,7 +87,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
     final secondNameField = TextFormField(
       autofocus: false,
-      controller: secondNameEditingController,
+      controller: _secondNameEditingController,
       keyboardType: TextInputType.name,
       validator: (value) {
         RegExp regex = new RegExp(r'^.{3,}$');
@@ -76,7 +97,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         return null;
       },
       onSaved: (value) {
-        secondNameEditingController.text = value!;
+        _secondNameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -103,7 +124,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         return null;
       },
       onSaved: (value) {
-        firstNameEditingController.text = value!;
+        _firstNameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -129,7 +150,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         }
       },
       onSaved: (value) {
-        firstNameEditingController.text = value!;
+        _firstNameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -188,10 +209,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           String res = await Authenticator().signUpUser(
               email: emailEditingController.text,
               password: passwordEditingController.text,
-              username: firstNameEditingController.text +
-                  " " +
-                  secondNameEditingController.text,
-              bio: bioEditingController.text);
+              username:
+                  "${_firstNameEditingController.text} ${_secondNameEditingController.text}",
+              bio: bioEditingController.text,
+              firstName: _firstNameEditingController.text,
+              secondName: _secondNameEditingController.text,
+              file: _image!);
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => NavigationScreen()));
         },
         child: Text(
           'SignUp',
@@ -230,17 +255,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   children: <Widget>[
                     Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 64,
-                          child: Image.asset(
-                            "assets/default_photo.png",
-                          ),
-                        ),
+                        _image != null
+                            ? CircleAvatar(
+                                radius: 64,
+                                backgroundImage: MemoryImage(_image!),
+                              )
+                            : CircleAvatar(
+                                radius: 64,
+                                child: Image.asset('assets/default_photo.png'),
+                              ),
                         Positioned(
                           bottom: -15,
                           left: 90,
                           child: IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              selectImage();
+                            },
                             icon: Icon(Icons.add_a_photo),
                           ),
                         ),
@@ -292,18 +322,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     User user = _auth.currentUser!;
 
-    UserModel userModel =
-        UserModel(email: '', firstName: '', secondName: '', uid: '');
+    UserModel userModel = UserModel(
+        email: '',
+        firstName: '',
+        secondName: '',
+        uid: '',
+        bio: '',
+        culls: 0,
+        friends: [],
+        photoUrl: '',
+        username: '');
 
     userModel.email = user.email!;
     userModel.uid = user.uid;
-    userModel.firstName = firstNameEditingController.text;
-    userModel.secondName = secondNameEditingController.text;
+    userModel.firstName = _firstNameEditingController.text;
+    userModel.secondName = _secondNameEditingController.text;
 
-    await firebaseFirestore
-        .collection('users')
-        .doc(user.uid)
-        .set(userModel.toMap());
+    await firebaseFirestore.collection('users').doc(user.uid).set(
+          userModel.toMap(),
+        );
 
     Fluttertoast.showToast(msg: "Account created successfully!");
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/src/screens/add_post_screen.dart';
+import 'package:squirrel/src/screens/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,25 +15,46 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser =
-      UserModel(email: '', firstName: '', secondName: '', uid: '');
+  UserModel loggedInUser = UserModel(
+      email: '',
+      firstName: '',
+      secondName: '',
+      uid: '',
+      bio: '',
+      culls: 0,
+      friends: [],
+      photoUrl: '',
+      username: '');
 
-  void initState() {
-    super.initState();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
-  }
+  // void initState() {
+  //   super.initState();
+  //   FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(user!.uid)
+  //       .get()
+  //       .then((value) {
+  //     loggedInUser = UserModel.fromSnap(value.data());
+  //     setState(() {});
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchScreen(),
+                ),
+              );
+            },
+            icon: Icon(Icons.search),
+          ),
+        ],
         automaticallyImplyLeading: false,
         title: Text('Home'),
         centerTitle: true,
@@ -57,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               },
-            )
+            ),
           ],
         ),
       ),

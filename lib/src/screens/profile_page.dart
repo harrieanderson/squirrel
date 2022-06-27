@@ -1,19 +1,57 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'dart:developer';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:typed_data';
 
+import 'package:image_picker/image_picker.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
-import 'package:squirrel/src/app.dart';
+import 'package:squirrel/models/usser_model.dart';
+import 'package:squirrel/utils/utils.dart';
 
 class ProfilePageUi extends StatefulWidget {
+  final String uid;
+
+  const ProfilePageUi({Key? key, required this.uid}) : super(key: key);
+
   @override
   _ProfilePageUiState createState() => _ProfilePageUiState();
 }
 
 class _ProfilePageUiState extends State<ProfilePageUi> {
+  Uint8List? _image;
+
+  var userData = {};
+
   @override
+  @override
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
+  }
+
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  // gets data from Firebase
+  getData() async {
+    try {
+      var snap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.uid)
+          .get();
+      userData = snap.data()!;
+      setState(() {});
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -38,17 +76,21 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                 children: <Widget>[
                   Stack(children: <Widget>[
                     CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          'https://scontent.flba3-1.fna.fbcdn.net/v/t39.30808-6/272059473_10224041200571270_2474966297877769639_n.jpg?_nc_cat=104&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=3UUeIYeWmlYAX-gmRhV&tn=IAl5phUutYdnzHba&_nc_ht=scontent.flba3-1.fna&oh=00_AT__xgdudmccvI83lDU9pNSxDXkqMUACHEuDfHv_Bny9Sw&oe=625EABA0'),
+                      backgroundImage: NetworkImage(userData['photoUrl']),
                       radius: 50,
                     ),
                     Positioned(
-                      bottom: 3,
-                      right: 2,
+                      bottom: 1,
+                      right: 1,
                       child: CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 15,
-                        child: Icon(Icons.edit),
+                        child: IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            selectImage();
+                          },
+                        ),
                       ),
                     ),
                   ]),
@@ -56,7 +98,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                     height: 10,
                   ),
                   Text(
-                    SharedPreferenceHelper().userName,
+                    userData['username'],
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
@@ -110,8 +152,8 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                     leading: Icon(Icons.location_on),
                   ),
                   ListTile(
-                    title: Text('Total culls'),
-                    subtitle: Text('15'),
+                    title: Text('culls'),
+                    subtitle: Text('2'),
                     leading: Icon(Icons.gps_fixed_rounded),
                   ),
                   ListTile(
@@ -121,7 +163,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                   ),
                   ListTile(
                     title: Text('About me'),
-                    subtitle: Text('I am currently doing development'),
+                    subtitle: Text(userData['bio']),
                     leading: Icon(Icons.info),
                   ),
                 ],

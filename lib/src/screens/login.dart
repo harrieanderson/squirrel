@@ -14,18 +14,37 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _emailcontroller = TextEditingController();
+  final TextEditingController _passwordcontroller = TextEditingController();
   final TextEditingController bioEditingController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
+  bool _isLoading = false;
 
   final _auth = FirebaseAuth.instance;
 
   @override
+  void dispose() {
+    super.dispose();
+    _emailcontroller.dispose();
+    _passwordcontroller.dispose();
+  }
+
+  void loginUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await Authenticator().loginUser(
+        email: _emailcontroller.text, password: _passwordcontroller.text);
+    if (res == 'success') {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => NavigationScreen()));
+    }
+  }
+
   Widget build(BuildContext context) {
     final emailField = TextFormField(
       autofocus: false,
-      controller: emailController,
+      controller: _emailcontroller,
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value!.isEmpty) {
@@ -38,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return null;
       },
       onSaved: (value) {
-        emailController.text = value!;
+        _emailcontroller.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -52,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
     final passwordField = TextFormField(
       autofocus: false,
-      controller: passwordController,
+      controller: _passwordcontroller,
       obscureText: true,
       validator: (value) {
         RegExp regex = RegExp(r'^.{6,}$');
@@ -65,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return null;
       },
       onSaved: (value) {
-        passwordController.text = value!;
+        _passwordcontroller.text = value!;
       },
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
@@ -86,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          signIn(emailController.text, passwordController.text);
+          loginUser();
         },
         child: Text(
           'Login',
@@ -198,7 +217,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void signIn(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       await Authenticator()
-          .signInWithEmailAndPassword(email, password)
+          .signInWithEmailAndPassword(
+              _emailcontroller.text, _passwordcontroller.text)
           .then((uid) => {
                 Fluttertoast.showToast(msg: "Login Successful"),
                 Navigator.of(context).pushReplacement(

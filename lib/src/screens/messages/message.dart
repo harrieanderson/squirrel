@@ -20,6 +20,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   TextEditingController searchUsernameEditingController =
       TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
   getMyInfoFromSharedPreference() {
     myName = SharedPreferenceHelper().displayName;
@@ -105,9 +106,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data!.docs[index];
                   return searchListUserTile(
-                      profileUrl: ds['imgUrl'],
-                      name: ds['name'],
-                      email: ds['email']);
+                    profileUrl: ds['imgUrl'],
+                    name: ds['name'],
+                    email: ds['email'],
+                  );
                 },
               )
             : Center(
@@ -132,6 +134,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    searchController.dispose();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

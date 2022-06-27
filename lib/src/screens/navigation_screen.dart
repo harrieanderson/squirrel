@@ -1,5 +1,6 @@
 // ignore_for_file: file_names, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:squirrel/src/screens/add_post_screen.dart';
 import 'package:squirrel/src/screens/google_map_screen.dart';
@@ -22,7 +23,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
       key: UniqueKey(),
     ),
     MessagesScreen(),
-    ProfilePageUi(),
+    ProfilePageUi(
+      key: UniqueKey(),
+      uid: FirebaseAuth.instance.currentUser!.uid,
+    ),
   ];
 
   @override
