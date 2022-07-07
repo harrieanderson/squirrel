@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:squirrel/src/screens/add_post_screen.dart';
 import 'package:squirrel/src/screens/google_map_screen.dart';
@@ -18,7 +19,9 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
   var current_index = 0;
   final screens = [
-    HomeScreen(),
+    HomeScreen(
+      uid: FirebaseAuth.instance.currentUser!.uid,
+    ),
     GoogleMapScreen(
       key: UniqueKey(),
     ),
@@ -43,7 +46,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddPostScreen(),
+                    builder: (context) => AddPostScreen(
+                      uid: FirebaseAuth.instance.currentUser!.uid,
+                    ),
                   ),
                 );
               },

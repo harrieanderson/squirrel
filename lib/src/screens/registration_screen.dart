@@ -77,8 +77,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: Icon(Icons.account_circle),
-        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        prefixIcon: Icon(
+          Icons.account_circle,
+        ),
+        contentPadding: EdgeInsets.fromLTRB(
+          20,
+          15,
+          20,
+          15,
+        ),
         hintText: 'First Name',
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -101,11 +108,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: Icon(Icons.account_circle),
-        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        prefixIcon: Icon(
+          Icons.account_circle,
+        ),
+        contentPadding: EdgeInsets.fromLTRB(
+          20,
+          15,
+          20,
+          15,
+        ),
         hintText: 'Second Name',
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(
+            10,
+          ),
         ),
       ),
     );
@@ -128,11 +144,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: Icon(Icons.mail),
-        contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
+        prefixIcon: Icon(
+          Icons.mail,
+        ),
+        contentPadding: EdgeInsets.fromLTRB(
+          20,
+          15,
+          20,
+          15,
+        ),
         hintText: 'Email',
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(
+            10,
+          ),
         ),
       ),
     );
@@ -214,15 +239,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               bio: bioEditingController.text,
               firstName: _firstNameEditingController.text,
               secondName: _secondNameEditingController.text,
-              file: _image!);
+              file: _image);
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => NavigationScreen()));
+            MaterialPageRoute(
+              builder: (context) => NavigationScreen(),
+            ),
+          );
         },
         child: Text(
           'SignUp',
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+            fontSize: 20,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -262,7 +293,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               )
                             : CircleAvatar(
                                 radius: 64,
-                                child: Image.asset('assets/default_photo.png'),
+                                backgroundImage: NetworkImage(
+                                    'https://firebasestorage.googleapis.com/v0/b/squirrel-84cdc.appspot.com/o/profilepics%2Fdefault_pic.png?alt=media&token=b1ab9a60-b5a8-4acd-aa32-a49167082fd6'),
                               ),
                         Positioned(
                           bottom: -15,
@@ -349,6 +381,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         MaterialPageRoute(
             builder: (context) => HomeScreen(
                   key: UniqueKey(),
+                  uid: FirebaseAuth.instance.currentUser!.uid,
                 )),
         (route) => false);
   }

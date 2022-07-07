@@ -12,5 +12,9 @@ void main() async {
   Future.wait([
     Firebase.initializeApp(),
     SharedPreferenceHelper.instance.initialise(),
-  ]).then((_) => runApp(App()));
+  ]).then(
+    (_) => runApp(
+      App(),
+    ),
+  );
 }

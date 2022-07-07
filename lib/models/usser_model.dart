@@ -138,6 +138,6 @@ class UserModel {
         "photoUrl": photoUrl,
         "bio": bio,
         "friends": friends,
-        "culls": culls
+        "culls": culls,
       };
 }

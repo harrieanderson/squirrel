@@ -39,10 +39,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   onSearchBtnClick() async {
     isSearching = true;
-    setState(() {});
+    setState(
+      () {},
+    );
     usersStream = await DatabaseMethods()
         .getUserByUsername(searchUsernameEditingController.text);
-    setState(() {});
+    setState(
+      () {},
+    );
   }
 
   Widget chatRoomsList() {
@@ -55,9 +59,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data!.docs[index];
-                  return ChatRoomListTile(ds['lastMessage'], ds.id, myUserName);
+                  return ChatRoomListTile(
+                    ds['lastMessage'],
+                    ds.id,
+                    myUserName,
+                  );
                 })
-            : Center(child: CircularProgressIndicator());
+            : Center(
+                child: CircularProgressIndicator(),
+              );
       },
     );
   }
@@ -72,24 +82,43 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
         DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
 
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ChatsScreen(name, email)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatsScreen(
+              name,
+              email,
+            ),
+          ),
+        );
       },
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(
+              30,
+            ),
             child: Image.network(
               profileUrl,
               height: 40,
               width: 40,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(
+            width: 12,
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [Text(name), Text(email)],
-          )
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -106,8 +135,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data!.docs[index];
                   return searchListUserTile(
-                    profileUrl: ds['imgUrl'],
-                    name: ds['name'],
+                    profileUrl: ds['photoUrl'],
+                    name: ds['username'],
                     email: ds['email'],
                   );
                 },
@@ -144,24 +173,38 @@ class _MessagesScreenState extends State<MessagesScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text('Messages'),
+        title: Text(
+          'Messages',
+        ),
         actions: [
           InkWell(
             onTap: () {
-              Authenticator().signOut().then((s) {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
-              });
+              Authenticator().signOut().then(
+                (s) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ),
+                  );
+                },
+              );
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Icon(Icons.exit_to_app),
+              padding: EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              child: Icon(
+                Icons.exit_to_app,
+              ),
             ),
-          )
+          ),
         ],
       ),
       body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 24),
+        margin: EdgeInsets.symmetric(
+          horizontal: 24,
+        ),
         child: Column(
           children: [
             Row(
@@ -171,40 +214,54 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         onTap: () {
                           isSearching = false;
                           searchUsernameEditingController.text = "";
-                          setState(() {});
+                          setState(
+                            () {},
+                          );
                         },
                         child: Padding(
-                          padding: EdgeInsets.only(right: 12),
-                          child: Icon(Icons.arrow_back),
+                          padding: EdgeInsets.only(
+                            right: 12,
+                          ),
+                          child: Icon(
+                            Icons.arrow_back,
+                          ),
                         ),
                       )
                     : Container(),
                 Expanded(
                   child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 16),
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    margin: EdgeInsets.symmetric(
+                      vertical: 16,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
                     decoration: BoxDecoration(
                       border: Border.all(
                           color: Colors.grey,
                           width: 1,
                           style: BorderStyle.solid),
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(
+                        24,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Expanded(
-                            child: TextField(
-                          controller: searchUsernameEditingController,
-                          decoration: InputDecoration(
-                              border: InputBorder.none, hintText: "username"),
-                        )),
+                          child: TextField(
+                            controller: searchUsernameEditingController,
+                            decoration: InputDecoration(
+                                border: InputBorder.none, hintText: "username"),
+                          ),
+                        ),
                         GestureDetector(
-                            onTap: () {
-                              if (searchUsernameEditingController.text != "") {
-                                onSearchBtnClick();
-                              }
-                            },
-                            child: Icon(Icons.search))
+                          onTap: () {
+                            if (searchUsernameEditingController.text != "") {
+                              onSearchBtnClick();
+                            }
+                          },
+                          child: Icon(Icons.search),
+                        )
                       ],
                     ),
                   ),
@@ -236,10 +293,11 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
     username =
         widget.chatRoomId.replaceAll(widget.myUsername, "").replaceAll("_", "");
     QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
-    print(querySnapshot.size);
     name = "${querySnapshot.docs[0]['name']}";
-    profilePicUrl = "${querySnapshot.docs[0]['imgUrl']}";
-    setState(() {});
+    profilePicUrl = "${querySnapshot.docs[0]['photoUrl']}";
+    setState(
+      () {},
+    );
   }
 
   @override

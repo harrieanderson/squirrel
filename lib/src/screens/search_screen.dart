@@ -24,21 +24,24 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back),
+        ),
         title: TextFormField(
           controller: searchController,
           decoration: const InputDecoration(
-            suffixIcon: Icon(Icons.search),
+            suffixIcon: Icon(
+              Icons.search,
+            ),
             label: Center(
-              child: Text('Search user'),
+              child: Text(
+                'Search user',
+              ),
             ),
           ),
-          onFieldSubmitted: (String _) {
-            setState(
-              () {
-                isShowUsers = true;
-              },
-            );
-          },
+          onFieldSubmitted: (_) => setState(() => isShowUsers = true),
         ),
       ),
       body: isShowUsers
@@ -59,6 +62,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemCount: (snapshot.data! as dynamic).docs.length,
                   itemBuilder: (context, index) {
                     return ListTile(
+                      onTap: () {},
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(
                           (snapshot.data! as dynamic).docs[index]['photoUrl'],

@@ -1,14 +1,16 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:typed_data';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
+import 'package:squirrel/models/repo.dart';
 import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/utils/utils.dart';
+
+const _kAvatarRadius = 45.0;
+const _kAvatarPadding = 8.0;
 
 class ProfilePageUi extends StatefulWidget {
   final String uid;
@@ -20,11 +22,11 @@ class ProfilePageUi extends StatefulWidget {
 }
 
 class _ProfilePageUiState extends State<ProfilePageUi> {
+  var currentUser = FirebaseAuth.instance.currentUser;
   Uint8List? _image;
 
-  var userData = {};
+  UserModel? userModel;
 
-  @override
   @override
   void selectImage() async {
     Uint8List im = await pickImage(ImageSource.gallery);
@@ -41,11 +43,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
   // gets data from Firebase
   getData() async {
     try {
-      var snap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(widget.uid)
-          .get();
-      userData = snap.data()!;
+      userModel = await Repo.getUser(widget.uid);
       setState(() {});
     } catch (e) {
       showSnackBar(context, e.toString());
@@ -54,122 +52,125 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Profile page'),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.notifications),
+            color: Colors.black,
+            iconSize: 35,
+          ),
+        ],
       ),
-      body: ListView(
-        children: <Widget>[
-          Container(
-            color: Colors.red,
-            height: MediaQuery.of(context).size.height * 0.3,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(
-                8.0,
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(_kAvatarPadding),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(userModel!.photoUrl),
+                  radius: _kAvatarRadius,
+                ),
               ),
-              child: Column(
-                children: <Widget>[
-                  Stack(children: <Widget>[
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(userData['photoUrl']),
-                      radius: 50,
-                    ),
-                    Positioned(
-                      bottom: 1,
-                      right: 1,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 15,
-                        child: IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            selectImage();
-                          },
-                        ),
-                      ),
-                    ),
-                  ]),
-                  SizedBox(
-                    height: 10,
+              Column(
+                children: [
+                  Text(
+                    userModel!.username,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  Text(userModel!.bio)
+                ],
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 100,
+              ),
+              TextButton.icon(
+                style: TextButton.styleFrom(
+                  textStyle: TextStyle(color: Colors.green, fontSize: 15),
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                ),
+                onPressed: () => {},
+                icon: Icon(
+                  Icons.person_add,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  'Add friend',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              TextButton.icon(
+                style: TextButton.styleFrom(
+                  textStyle: TextStyle(color: Colors.blue, fontSize: 15),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                ),
+                onPressed: () => {},
+                icon: Icon(
+                  Icons.mail,
+                ),
+                label: Text(
+                  'Message',
+                ),
+              ),
+            ],
+          ),
+          Divider(
+            thickness: 1,
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 131,
+              ),
+              Column(
+                children: [
+                  Text(
+                    userModel!.culls.toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Text(
-                    userData['username'],
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
+                    'Culls ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  SizedBox(
-                    height: 5,
+                ],
+              ),
+              SizedBox(
+                width: 30,
+              ),
+              Column(
+                children: [
+                  Text(
+                    userModel!.culls.toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Text(
-                    'North Yorkshire, England',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
+                    'Friends ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
-          Card(
-            child: Container(
-              padding: EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Text('Add Friend'),
-                      IconButton(onPressed: () {}, icon: Icon(Icons.person_add))
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text('Message'),
-                      IconButton(onPressed: () {}, icon: Icon(Icons.mail))
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          Divider(
+            thickness: 1,
           ),
-          Card(
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  Text('User Information'),
-                  Divider(),
-                  ListTile(
-                    title: Text('Location'),
-                    subtitle: Text('North Yorkshire, England'),
-                    leading: Icon(Icons.location_on),
-                  ),
-                  ListTile(
-                    title: Text('culls'),
-                    subtitle: Text('2'),
-                    leading: Icon(Icons.gps_fixed_rounded),
-                  ),
-                  ListTile(
-                    title: Text('Phone'),
-                    subtitle: Text('123456789'),
-                    leading: Icon(Icons.phone),
-                  ),
-                  ListTile(
-                    title: Text('About me'),
-                    subtitle: Text(userData['bio']),
-                    leading: Icon(Icons.info),
-                  ),
-                ],
-              ),
-            ),
-          )
+          Text('Posts')
         ],
       ),
     );

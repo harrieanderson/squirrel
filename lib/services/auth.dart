@@ -10,9 +10,25 @@ import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
 import 'package:squirrel/services/database.dart';
 import 'package:squirrel/services/storage_methods.dart';
 
+class AuthMethods {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // get user details
+  Future<model.UserModel> getUserDetails() async {
+    User currentUser = _auth.currentUser!;
+
+    DocumentSnapshot documentSnapshot =
+        await _firestore.collection('users').doc(currentUser.uid).get();
+
+    return model.UserModel.fromSnap(documentSnapshot);
+  }
+}
+
 class Authenticator {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<String> signUpUser(
       {required String email,
@@ -21,7 +37,7 @@ class Authenticator {
       required String secondName,
       required String username,
       required String bio,
-      required Uint8List file}) async {
+      required Uint8List? file}) async {
     String res = "An error occured";
 
     try {
@@ -34,9 +50,12 @@ class Authenticator {
         // register user
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
-
-        String photoUrl = await StorageMethods()
-            .uploadImageToStorage('profilepics', file, false);
+        String photoUrl =
+            'https://firebasestorage.googleapis.com/v0/b/squirrel-84cdc.appspot.com/o/profilepics%2Fdefault_pic.png?alt=media&token=b1ab9a60-b5a8-4acd-aa32-a49167082fd6';
+        if (file != null) {
+          photoUrl = await StorageMethods()
+              .uploadImageToStorage('profilepics', file, false);
+        }
 
         //   model
         model.UserModel _user = model.UserModel(
@@ -51,7 +70,7 @@ class Authenticator {
             bio: bio);
 
         // add user to our database
-        await firestore
+        await _firestore
             .collection('users')
             .doc(cred.user!.uid)
             .set(_user.toMap());

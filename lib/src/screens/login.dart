@@ -37,7 +37,10 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailcontroller.text, password: _passwordcontroller.text);
     if (res == 'success') {
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => NavigationScreen()));
+        MaterialPageRoute(
+          builder: (context) => NavigationScreen(),
+        ),
+      );
     }
   }
 
@@ -176,13 +179,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         Authenticator()
                             .signInWithGoogle(context)
                             .then((uid) => {
-                                  Fluttertoast.showToast(
-                                      msg: "login Successful"),
+                                  // Fluttertoast.showToast(msg: "login Successful"),
                                   Navigator.of(context)
                                       .pushReplacement(
                                     MaterialPageRoute(
                                       builder: (context) => HomeScreen(
                                         key: UniqueKey(),
+                                        uid: FirebaseAuth
+                                            .instance.currentUser!.uid,
                                       ),
                                     ),
                                   )
