@@ -1,18 +1,18 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/widgets.dart';
-// import 'package:squirrel/services/auth.dart';
-// import 'package:squirrel/models/repo.dart';
+import 'package:flutter/widgets.dart';
+import 'package:squirrel/models/user.dart';
 
-// class UserProvider with ChangeNotifier {
-//   User? _user;
-//   final Authenticator _repo = Authenticator();
+import 'package:squirrel/services/auth.dart';
 
-//   User get getUser => _user!;
+class UserProvider with ChangeNotifier {
+  User? _user;
+  final AuthMethods _authMethods = AuthMethods();
 
-//   Future<void> refreshUser() async {
-//     User user = await _aut
-//     _user = user;
-//     notifyListeners();
-//   }
-// }
+  User get getUser => _user!;
+
+  Future<void> refreshUser() async {
+    User user = await _authMethods.getUserDetails();
+    _user = user;
+    notifyListeners();
+  }
+}

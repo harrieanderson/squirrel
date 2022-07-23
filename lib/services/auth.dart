@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:squirrel/models/usser_model.dart' as model;
+import 'package:squirrel/models/user.dart' as model;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
@@ -15,13 +15,13 @@ class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // get user details
-  Future<model.UserModel> getUserDetails() async {
+  Future<model.User> getUserDetails() async {
     User currentUser = _auth.currentUser!;
 
     DocumentSnapshot documentSnapshot =
         await _firestore.collection('users').doc(currentUser.uid).get();
 
-    return model.UserModel.fromSnap(documentSnapshot);
+    return model.User.fromSnap(documentSnapshot);
   }
 }
 
@@ -58,7 +58,7 @@ class Authenticator {
         }
 
         //   model
-        model.UserModel _user = model.UserModel(
+        model.User _user = model.User(
             username: username,
             firstName: firstName,
             secondName: secondName,
@@ -73,7 +73,7 @@ class Authenticator {
         await _firestore
             .collection('users')
             .doc(cred.user!.uid)
-            .set(_user.toMap());
+            .set(_user.toJson());
         res = 'success';
       }
     } catch (err) {

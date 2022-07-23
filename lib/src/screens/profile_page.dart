@@ -22,7 +22,8 @@ class ProfilePageUi extends StatefulWidget {
 }
 
 class _ProfilePageUiState extends State<ProfilePageUi> {
-  var currentUser = FirebaseAuth.instance.currentUser;
+  late var _isLoggedOnUser =
+      userModel!.uid == FirebaseAuth.instance.currentUser;
   Uint8List? _image;
 
   UserModel? userModel;
@@ -86,50 +87,53 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
               ),
             ],
           ),
-          Row(
-            children: [
-              SizedBox(
-                width: 100,
-              ),
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  textStyle: TextStyle(color: Colors.green, fontSize: 15),
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0),
+          if (_isLoggedOnUser != true)
+            Container()
+          else
+            Row(
+              children: [
+                SizedBox(
+                  width: 100,
+                ),
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    textStyle: TextStyle(color: Colors.green, fontSize: 15),
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                    ),
+                  ),
+                  onPressed: () => {},
+                  icon: Icon(
+                    Icons.person_add,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    'Add friend',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-                onPressed: () => {},
-                icon: Icon(
-                  Icons.person_add,
-                  color: Colors.white,
+                SizedBox(
+                  width: 20,
                 ),
-                label: Text(
-                  'Add friend',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  textStyle: TextStyle(color: Colors.blue, fontSize: 15),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0),
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    textStyle: TextStyle(color: Colors.blue, fontSize: 15),
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                    ),
+                  ),
+                  onPressed: () => {},
+                  icon: Icon(
+                    Icons.mail,
+                  ),
+                  label: Text(
+                    'Message',
                   ),
                 ),
-                onPressed: () => {},
-                icon: Icon(
-                  Icons.mail,
-                ),
-                label: Text(
-                  'Message',
-                ),
-              ),
-            ],
-          ),
+              ],
+            ),
           Divider(
             thickness: 1,
           ),
@@ -145,7 +149,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Text(
-                    'Culls ',
+                    'Culls',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ],
@@ -160,7 +164,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Text(
-                    'Friends ',
+                    'Friends',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                 ],

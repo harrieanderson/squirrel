@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/src/screens/add_post_screen.dart';
 import 'package:squirrel/src/screens/search_screen.dart';
 import 'package:squirrel/utils/utils.dart';

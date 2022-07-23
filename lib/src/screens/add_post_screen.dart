@@ -2,13 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:squirrel/models/repo.dart';
 import 'package:squirrel/models/user_provider.dart';
 import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/services/firestore_methods.dart';
 import 'package:squirrel/utils/utils.dart';
-import 'package:provider/provider.dart';
-import 'package:squirrel/models/repo.dart';
 
 class AddPostScreen extends StatefulWidget {
   final String uid;
@@ -20,27 +19,14 @@ class AddPostScreen extends StatefulWidget {
 
 class _AddPostScreenState extends State<AddPostScreen> {
   Uint8List? _file;
-  bool isLoading = false;
-  final TextEditingController _descriptionController = TextEditingController();
+  bool _isLoading = false;
 
-  void makePost(
-    String uid,
-    String username,
-    String photoUrl,
-  ) async {
-    try {
-      String res = await FirestoreMethods().uploadPost(
-          _descriptionController.text, _file!, uid, username, photoUrl);
+  final TextEditingController _postText = TextEditingController();
 
-      if (res == "success") {
-        // ignore: use_build_context_synchronously
-        showSnackBar(context, 'Posted!');
-      } else {
-        showSnackBar(context, res);
-      }
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
+  @override
+  void dispose() {
+    super.dispose();
+    _postText.dispose();
   }
 
   void selectImage() async {
@@ -50,93 +36,140 @@ class _AddPostScreenState extends State<AddPostScreen> {
     });
   }
 
+  void makePost(String uid, String username, String profImage) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      String res = await FirestoreMethods().uploadPost(
+        _postText.text,
+        _file!,
+        uid,
+        username,
+        profImage,
+      );
+      if (res == 'success') {
+        setState(() {
+          _isLoading = false;
+        });
+        showSnackBar(
+          context,
+          'posted!',
+        );
+        clearImage();
+      } else {
+        showSnackBar(context, res);
+      }
+    } catch (err) {
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+  }
+
+  void clearImage() {
+    setState(() {
+      _file == null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    UserModel? userModel;
-
-    // final UserProvider userProvider = Provider.of<UserProvider>(context);
+    final UserProvider userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Make a post'),
         centerTitle: true,
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(
-              context,
-            );
-          },
+          onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.close),
         ),
         actions: [
           IconButton(
-              constraints: BoxConstraints.expand(width: 50),
-              icon: Text(
-                'Post',
-                textAlign: TextAlign.center,
-              ),
-              onPressed: () => {}
-              // makePost(
-              // userModel!.uid, userModel.username, userModel.photoUrl),
-              ),
+            constraints: BoxConstraints.expand(
+              width: 50,
+            ),
+            icon: Text(
+              'Post',
+              textAlign: TextAlign.center,
+            ),
+            onPressed: () => makePost(
+              userProvider.getUser.uid,
+              userProvider.getUser.username,
+              userProvider.getUser.photoUrl,
+            ),
+          ),
         ],
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(
+              8.0,
+            ),
             child: FutureBuilder<UserModel>(
-                future: Repo.getUser(widget.uid),
-                builder: (context, snapshot) {
-                  final userModel = snapshot.data;
-                  if (userModel == null) {
-                    return Container();
-                  }
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            userModel.photoUrl,
-                          ),
+              future: Repo.getUser(widget.uid),
+              builder: (context, snapshot) {
+                final userModel = snapshot.data;
+                if (userModel == null) {
+                  return Container();
+                }
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          userModel.photoUrl,
                         ),
                       ),
-                      Text(
-                        userModel.username,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    Text(
+                      userModel.username,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  );
-                }),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
           TextField(
-            controller: _descriptionController,
             decoration: InputDecoration(
               labelText: "What's happening?",
               suffixIcon: GestureDetector(
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  Uint8List file = await pickImage(ImageSource.gallery);
-                  setState(() {
-                    _file = file;
-                  });
-                },
+                onTap: () => selectImage(),
                 child: Icon(
                   Icons.image,
                 ),
               ),
             ),
+            onChanged: (value) {
+              _postText.text = value;
+            },
           ),
-          // Container(
-          //   decoration: BoxDecoration(
-          //     image: DecorationImage(
-          //       image: MemoryImage(_file!),
-          //     ),
-          //   ),
-          // )
+          SizedBox(
+            height: 3,
+          ),
+          _file == null
+              ? Container()
+              : Column(
+                  children: [
+                    Container(
+                      height: 200,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Image.memory(_file!),
+                      ),
+                    ),
+                  ],
+                ),
         ],
       ),
     );

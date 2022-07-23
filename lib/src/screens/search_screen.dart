@@ -53,8 +53,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   .get(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return Center(
+                    child: Container(),
                   );
                 }
 

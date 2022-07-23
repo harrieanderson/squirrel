@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 class FirestoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // upload post
   Future<String> uploadPost(
     String description,
     Uint8List file,
