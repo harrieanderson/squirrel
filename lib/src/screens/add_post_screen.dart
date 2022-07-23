@@ -54,7 +54,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     try {
       String res = await FirestoreMethods().uploadPost(
         _postText.text,
-        _file,
+        _file!,
         uid,
         username,
         profImage,
@@ -90,7 +90,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final UserProvider userProvider = Provider.of<UserProvider>(context);
+    // final UserProvider userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Make a post'),
@@ -101,16 +101,27 @@ class _AddPostScreenState extends State<AddPostScreen> {
         ),
         actions: [
           IconButton(
-            constraints: BoxConstraints.expand(
-              width: 50,
-            ),
-            icon: Text(
-              'Post',
-              textAlign: TextAlign.center,
-            ),
-            onPressed: () => makePost(userProvider.getUser.username,
-                userProvider.getUser.uid, userProvider.getUser.photoUrl),
-          ),
+              constraints: BoxConstraints.expand(
+                width: 50,
+              ),
+              icon: Text(
+                'Post',
+                textAlign: TextAlign.center,
+              ),
+              onPressed: () async {
+                setState(() {});
+
+                if (_postText.text.isNotEmpty) {
+                  String image;
+                  if (_file == null) {
+                    image = '';
+                  } else {
+                    image = await StorageMethods()
+                        .uploadImageToStorage('posts', _file!, true);
+                    showSnackBar(context, 'posted!');
+                  }
+                }
+              }),
         ],
       ),
       body: Column(
