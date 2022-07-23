@@ -36,7 +36,7 @@ class FirestoreMethods {
             post.toJson(),
           );
 
-      res = "succes";
+      res = "success";
     } catch (err) {
       res = err.toString();
     }

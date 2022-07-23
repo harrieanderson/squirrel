@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,18 +19,6 @@ class StorageService {
     }
     UploadTask uploadTask = storageRef
         .child('images/users/userProfile_$uniquePhotoId.jpg')
-        .putFile(image!);
-    TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-    String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-    return downloadUrl;
-  }
-
-  static Future<String> uploadTweetPicture(File imageFile) async {
-    String uniquePhotoId = Uuid().v4();
-    File? image = await compressImage(uniquePhotoId, imageFile);
-
-    UploadTask uploadTask = storageRef
-        .child('images/posts/post_$uniquePhotoId.jpg')
         .putFile(image!);
     TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
     String downloadUrl = await taskSnapshot.ref.getDownloadURL();

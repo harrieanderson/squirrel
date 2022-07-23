@@ -1,13 +1,21 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
+import 'package:squirrel/models/post.dart';
 import 'package:squirrel/models/repo.dart';
 import 'package:squirrel/models/user_provider.dart';
 import 'package:squirrel/models/usser_model.dart';
+import 'package:squirrel/services/database.dart';
 import 'package:squirrel/services/firestore_methods.dart';
+import 'package:squirrel/services/storage_methods.dart';
+import 'package:squirrel/services/storage_service.dart';
 import 'package:squirrel/utils/utils.dart';
+import 'package:uuid/uuid.dart';
 
 class AddPostScreen extends StatefulWidget {
   final String uid;
@@ -18,8 +26,11 @@ class AddPostScreen extends StatefulWidget {
 }
 
 class _AddPostScreenState extends State<AddPostScreen> {
+  late var _isLoggedOnUser =
+      userModel!.uid == FirebaseAuth.instance.currentUser;
   Uint8List? _file;
   bool _isLoading = false;
+  UserModel? userModel;
 
   final TextEditingController _postText = TextEditingController();
 
@@ -97,11 +108,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
               'Post',
               textAlign: TextAlign.center,
             ),
-            onPressed: () => makePost(
-              userProvider.getUser.uid,
-              userProvider.getUser.username,
-              userProvider.getUser.photoUrl,
-            ),
+            onPressed: () => makePost(userProvider.getUser.username,
+                userProvider.getUser.uid, userProvider.getUser.photoUrl),
           ),
         ],
       ),
