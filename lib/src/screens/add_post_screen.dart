@@ -54,7 +54,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     try {
       String res = await FirestoreMethods().uploadPost(
         _postText.text,
-        _file!,
+        _file,
         uid,
         username,
         profImage,

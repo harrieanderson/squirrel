@@ -8,18 +8,22 @@ import 'package:uuid/uuid.dart';
 class FirestoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // upload post
+// upload post
   Future<String> uploadPost(
     String description,
-    Uint8List file,
+    Uint8List? file,
     String uid,
     String username,
     String profImage,
   ) async {
     String res = "some error occured";
     try {
-      String photoUrl =
-          await StorageMethods().uploadImageToStorage('posts', file, true);
+      String? photoUrl;
+
+      if (file != null) {
+        photoUrl =
+            await StorageMethods().uploadImageToStorage('posts', file, true);
+      }
 
       String postId = const Uuid().v1();
       Post post = Post(
@@ -29,7 +33,7 @@ class FirestoreMethods {
         likes: [],
         postId: postId,
         datePublished: DateTime.now(),
-        postUrl: photoUrl,
+        postUrl: photoUrl ?? '', // TODO: emtpy or null?
         profImage: profImage,
       );
       _firestore.collection('posts').doc(postId).set(
