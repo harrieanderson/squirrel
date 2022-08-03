@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,13 +33,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   bool _isLoading = false;
   UserModel? userModel;
 
-  final TextEditingController _postText = TextEditingController();
-
-  @override
-  void dispose() {
-    super.dispose();
-    _postText.dispose();
-  }
+  late String _postText;
 
   void selectImage() async {
     Uint8List file = await pickImage(ImageSource.gallery);
@@ -53,7 +48,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     });
     try {
       String res = await FirestoreMethods().uploadPost(
-        _postText.text,
+        _postText,
         _file!,
         uid,
         username,
@@ -111,17 +106,37 @@ class _AddPostScreenState extends State<AddPostScreen> {
               onPressed: () async {
                 setState(() {});
 
-                if (_postText.text.isNotEmpty) {
+                if (_postText.isNotEmpty) {
                   String image;
                   if (_file == null) {
                     image = '';
                   } else {
                     image = await StorageMethods()
                         .uploadImageToStorage('posts', _file!, true);
-                    showSnackBar(context, 'posted!');
+                    showSnackBar(
+                      context,
+                      'posted!',
+                    );
                   }
+                  Post post = Post(
+                    authorId: widget.uid,
+                    text: _postText,
+                    image: image,
+                    timestamp: Timestamp.fromDate(DateTime.now()),
+                    likes: 0,
+                  );
+                  showSnackBar(context, 'posted!');
+                  DatabaseMethods.createPost(post);
+                  Navigator.pop(context);
                 }
+                setState(() {
+                  _isLoading = false;
+                });
               }),
+          SizedBox(
+            height: 20,
+          ),
+          _isLoading ? CircularProgressIndicator() : SizedBox.shrink()
         ],
       ),
       body: Column(
@@ -170,7 +185,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ),
             ),
             onChanged: (value) {
-              _postText.text = value;
+              _postText = value;
             },
           ),
           SizedBox(

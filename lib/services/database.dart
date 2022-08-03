@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
+import 'package:squirrel/models/post.dart';
+import 'package:squirrel/utils/constant.dart';
 
 class DatabaseMethods {
   Future addUserInfoToDB(
@@ -70,6 +72,29 @@ class DatabaseMethods {
         .orderBy("lastMessageSendTs", descending: true)
         .where("users", arrayContains: myUsername)
         .snapshots();
+  }
+
+  static void createPost(Post post) {
+    postsRef.doc(post.authorId).set({'postTime': post.timestamp});
+    postsRef.doc(post.authorId).collection("userPosts").add({
+      // "username": post.username,
+      "text": post.text,
+      "image": post.image,
+      "authorId": post.authorId,
+      "timestamp": post.timestamp,
+      "likes": post.likes
+    });
+  }
+
+  static Future<List<Post>> getUserPosts(String userId) async {
+    QuerySnapshot userPostsSnap = await postsRef
+        .doc(userId)
+        .collection('userPosts')
+        .orderBy('timestamp', descending: true)
+        .get();
+    List<Post> userPosts =
+        userPostsSnap.docs.map((doc) => Post.fromDoc(doc)).toList();
+    return userPosts;
   }
 
   Future<QuerySnapshot> getUserInfo(String username) async {

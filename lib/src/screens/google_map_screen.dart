@@ -21,13 +21,23 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
         body: Column(
           children: <Widget>[
             SizedBox(
-                height: MediaQuery.of(context).size.height / 2,
-                width: MediaQuery.of(context).size.width,
-                child: GoogleMap(
-                  initialCameraPosition:
-                      CameraPosition(target: LatLng(54.3091267, -5.1172292)),
-                  zoomControlsEnabled: true,
-                )),
+              height: MediaQuery.of(context).size.height / 2,
+              // width: MediaQuery.of(context).size.width,
+              child: GoogleMap(
+                onTap: (pos) {
+                  print(pos);
+                  Marker(markerId: MarkerId('1'));
+                },
+                onMapCreated: (GoogleMapController controller) {},
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    54.3091267,
+                    -5.1172292,
+                  ),
+                ),
+                zoomControlsEnabled: true,
+              ),
+            ),
           ],
         ));
   }

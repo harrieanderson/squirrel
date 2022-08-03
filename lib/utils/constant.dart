@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 
 final _fireStore = FirebaseFirestore.instance;
 
@@ -12,7 +11,7 @@ final followingRef = _fireStore.collection('following');
 
 final storageRef = FirebaseStorage.instance.ref();
 
-final tweetsRef = _fireStore.collection('tweets');
+final postsRef = _fireStore.collection('posts');
 
 final feedRefs = _fireStore.collection('feeds');
 

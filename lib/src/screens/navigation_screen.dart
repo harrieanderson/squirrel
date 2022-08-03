@@ -29,6 +29,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     ProfilePageUi(
       key: UniqueKey(),
       uid: FirebaseAuth.instance.currentUser!.uid,
+      visitedUserId: FirebaseAuth.instance.currentUser!.uid,
     ),
   ];
 
