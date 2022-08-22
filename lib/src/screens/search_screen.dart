@@ -1,45 +1,101 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
+import 'package:squirrel/models/repo.dart';
+import 'package:squirrel/models/user.dart';
+import 'package:squirrel/models/usser_model.dart';
+import 'package:squirrel/services/database.dart';
 import 'package:squirrel/src/screens/home_screen.dart';
 import 'package:squirrel/src/screens/navigation_screen.dart';
+import 'package:squirrel/src/screens/profile_page.dart';
+import 'package:squirrel/src/widgets/PostContainer.dart';
+import 'package:squirrel/utils/utils.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  final String currentUserId;
 
+  const SearchScreen({Key? key, required this.currentUserId}) : super(key: key);
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController searchController = TextEditingController();
   bool isShowUsers = false;
+  late Future<QuerySnapshot<Object>>? _users;
+  TextEditingController _searchController = TextEditingController();
+  UserModel user;
 
-  @override
-  void dispose() {
-    super.dispose();
-    searchController.dispose();
+  clearSearch() {
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _searchController.clear());
+    setState(() {
+      _users = null;
+      ListTile();
+    });
+  }
+
+  getData() async {
+    try {
+      userModel = await Repo.getUser(widget.currentUserId);
+      setState(() {});
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  buildUserTile(UserModel user) {
+    return ListTile(
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundImage: NetworkImage(
+          user.photoUrl,
+        ),
+      ),
+      title: Text(
+        user.username,
+      ),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ProfilePageUi(
+              uid: widget.currentUserId,
+              visitedUserId: user.uid,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back),
-        ),
+        centerTitle: true,
+        elevation: 0.5,
         title: TextFormField(
-          controller: searchController,
-          decoration: const InputDecoration(
-            suffixIcon: Icon(
-              Icons.search,
-            ),
-            label: Center(
-              child: Text(
-                'Search user',
+          controller: _searchController,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(vertical: 15),
+            hintText: 'Search User...',
+            hintStyle: TextStyle(color: Colors.white),
+            border: InputBorder.none,
+            prefixIcon: Icon(Icons.search, color: Colors.white),
+            suffixIcon: IconButton(
+              icon: Icon(
+                Icons.clear,
+                color: Colors.white,
               ),
+              onPressed: () {
+                clearSearch();
+              },
             ),
+            filled: true,
           ),
           onFieldSubmitted: (_) => setState(() => isShowUsers = true),
         ),
@@ -49,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
               future: FirebaseFirestore.instance
                   .collection('users')
                   .where('username',
-                      isGreaterThanOrEqualTo: searchController.text)
+                      isGreaterThanOrEqualTo: _searchController.text)
                   .get(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -62,7 +118,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemCount: (snapshot.data! as dynamic).docs.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      onTap: () {},
+                      onTap: () => buildUserTile(user),
                       leading: CircleAvatar(
                         backgroundImage: NetworkImage(
                           (snapshot.data! as dynamic).docs[index]['photoUrl'],
