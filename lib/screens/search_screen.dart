@@ -20,14 +20,14 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late Future<QuerySnapshot<Object>>? _users;
+  String searchString = '';
   TextEditingController _searchController = TextEditingController();
 
   clearSearch() {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _searchController.clear());
     setState(() {
-      _users = null;
+      searchString = '';
     });
   }
 
@@ -69,7 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 color: Colors.white,
               ),
               onPressed: () {
-                // clearSearch();
+                clearSearch();
               },
             ),
             filled: true,
@@ -77,13 +77,13 @@ class _SearchScreenState extends State<SearchScreen> {
           onChanged: (input) {
             if (input.isNotEmpty) {
               setState(() {
-                _users = DatabaseMethods.searchUsers(input);
+                searchString = _searchController.text;
               });
             }
           },
         ),
       ),
-      body: _users == null
+      body: searchString.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -95,26 +95,24 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             )
-          : FutureBuilder(
-              future: _users,
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (!snapshot.hasData) {
+          : FutureBuilder<List<UserModel>>(
+              future: DatabaseMethods.searchUsers(searchString),
+              builder: (context, snapshot) {
+                final list = snapshot.data;
+                if (list == null) {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
-                if (snapshot.data.documents.length == 0) {
+                if (list.isEmpty) {
                   return Center(
                     child: Text('No users found'),
                   );
                 }
                 return ListView.builder(
-                  itemCount: snapshot.data.documents.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    UserModel user = UserModel.fromSnap(
-                      snapshot.data.documents[index],
-                    );
-                    return buildUserTile(user);
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    return buildUserTile(list[index]);
                   },
                 );
               },
