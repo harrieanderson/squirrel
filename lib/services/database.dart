@@ -3,6 +3,7 @@ import 'package:squirrel/helperfunctions/sharedpref_helper.dart';
 import 'package:squirrel/models/cull_model.dart';
 import 'package:squirrel/models/post.dart';
 import 'package:squirrel/models/sighting_model.dart';
+import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/utils/constant.dart';
 
 class DatabaseMethods {
@@ -13,13 +14,20 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
-  static Future<QuerySnapshot<Object>> searchUsers(String name) async {
-    Future<QuerySnapshot<Object>>? users = usersRef
+  static Future searchUsers(String name) async {
+    // final doc = users.doc
+    final users = await usersRef
         .where('name', isGreaterThanOrEqualTo: name)
         .where('name', isLessThan: name + 'z')
         .get();
 
-    return users;
+    final listOfUserModels = <UserModel>[];
+    for (var doc in docs) {
+      listOfUserModels.add(
+        UserModel.fromSnap(doc),
+      );
+    }
+    return listOfUserModels;
   }
 
   Stream<QuerySnapshot> getUserByUsername(String username) {
