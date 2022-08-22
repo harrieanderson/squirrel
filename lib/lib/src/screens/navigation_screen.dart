@@ -43,6 +43,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       ),
       floatingActionButton: current_index == 0
           ? FloatingActionButton(
+              heroTag: null,
               elevation: 3,
               onPressed: () {
                 Navigator.push(

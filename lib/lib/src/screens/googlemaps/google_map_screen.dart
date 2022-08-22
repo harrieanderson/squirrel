@@ -64,63 +64,63 @@ class _GoogleMapScreenState extends State<GoogleMapScreen> {
 
   Future<String> promptForColour(context) async {
     return await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Center(
-              child: Text(
-                'Which species',
-              ),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: Text(
+              'Which species',
             ),
-            actions: [
-              Center(
-                child: SizedBox(
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: TextButton(
-                      onPressed: () =>
-                          Navigator.of(context).pop('Ring Necked Parakeet'),
-                      child: Text('Ring Necked Parakeet'),
-                    ),
+          ),
+          actions: [
+            Center(
+              child: SizedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: TextButton(
+                    onPressed: () =>
+                        Navigator.of(context).pop('Ring Necked Parakeet'),
+                    child: Text('Ring Necked Parakeet'),
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop('grey'),
-                        child: Text('Grey'),
-                      ),
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop('grey'),
+                      child: Text('Grey'),
                     ),
                   ),
-                  SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop('red'),
-                        child: Text('Red'),
-                      ),
+                ),
+                SizedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop('red'),
+                      child: Text('Red'),
                     ),
                   ),
-                  SizedBox(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: TextButton(
-                        onPressed: () =>
-                            Navigator.of(context).pop('pine marten'),
-                        child: Text('pine marten'),
-                      ),
+                ),
+                SizedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop('pine marten'),
+                      child: Text('pine marten'),
                     ),
                   ),
-                ],
-              ),
-            ],
-          );
-        });
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   static final CameraPosition england =

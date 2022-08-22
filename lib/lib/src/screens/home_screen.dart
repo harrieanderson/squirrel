@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:squirrel/models/repo.dart';
+import 'package:squirrel/models/usser_model.dart';
 import 'package:squirrel/src/screens/add_post_screen.dart';
 import 'package:squirrel/src/screens/search_screen.dart';
 import 'package:squirrel/utils/utils.dart';
@@ -64,10 +66,27 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    userData['photoUrl'],
-                  ),
+                FutureBuilder<UserModel>(
+                  future: Repo.getUser(widget.uid),
+                  builder: (context, snapshot) {
+                    final userModel = snapshot.data;
+                    if (userModel == null) {
+                      return Container();
+                    }
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              userModel.photoUrl,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 GestureDetector(
                   onTap: () {

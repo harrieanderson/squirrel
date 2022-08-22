@@ -73,18 +73,9 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
 
   void initState() {
     super.initState();
-    getData();
     getAllPosts();
-  }
 
-  // gets data from Firebase
-  getData() async {
-    try {
-      userModel = await Repo.getUser(widget.uid);
-      setState(() {});
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
+    getAllPosts();
   }
 
   Widget build(BuildContext context) {
@@ -107,9 +98,27 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
             children: [
               Padding(
                 padding: EdgeInsets.all(_kAvatarPadding),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(userModel!.photoUrl),
-                  radius: _kAvatarRadius,
+                child: FutureBuilder<UserModel>(
+                  future: Repo.getUser(widget.uid),
+                  builder: (context, snapshot) {
+                    final userModel = snapshot.data;
+                    if (userModel == null) {
+                      return Container();
+                    }
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              userModel.photoUrl,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
               Column(
