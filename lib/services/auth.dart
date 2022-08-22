@@ -65,7 +65,7 @@ class Authenticator {
             uid: cred.user!.uid,
             email: email,
             photoUrl: photoUrl,
-            culls: 0,
+            culls: [],
             friends: [],
             bio: bio);
 
@@ -112,62 +112,9 @@ class Authenticator {
     return _auth.currentUser != null;
   }
 
-  Future<void> signInWithGoogle(BuildContext context) async {
-    final FirebaseAuth _firebaseauth = FirebaseAuth.instance;
-    final GoogleSignIn _googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? googleSignInAccount =
-        await _googleSignIn.signIn();
-    final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount!.authentication;
-    final AuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleSignInAuthentication.idToken,
-        accessToken: googleSignInAuthentication.accessToken);
-    UserCredential result =
-        await _firebaseauth.signInWithCredential(credential);
-    final user = result.user;
-    if (user != null) {
-      await _saveUserData(user);
-    }
-  }
-
-  Future<void> signInWithEmailAndPassword(String email, String password) async {
-    final credentials = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    if (credentials.user != null) {
-      await _saveUserData(credentials.user!);
-    }
-  }
-
   signOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
     await _auth.signOut();
-  }
-
-  Future<void> _saveUserData(User user) async {
-    SharedPreferenceHelper().userEmail = user.email ?? '';
-    SharedPreferenceHelper().userId = user.uid;
-    var indexToDrop = user.email!.indexOf('@');
-    if (indexToDrop < 0) {
-      indexToDrop = user.email!.length;
-    }
-    SharedPreferenceHelper().userName = user.email!.substring(
-      0,
-      indexToDrop,
-    );
-    print('user name = ${SharedPreferenceHelper().userName}');
-    SharedPreferenceHelper().displayName = user.displayName ?? "";
-    SharedPreferenceHelper().userProfileUrl = user.photoURL ?? "";
-
-    Map<String, dynamic> userInfoMap = {
-      "email": SharedPreferenceHelper().userEmail,
-      "username": SharedPreferenceHelper().userName,
-      "name": SharedPreferenceHelper().displayName,
-      "imgUrl": SharedPreferenceHelper().userProfileUrl,
-    };
-
-    await DatabaseMethods().addUserInfoToDB(user.uid, userInfoMap);
   }
 }
