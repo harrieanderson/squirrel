@@ -20,45 +20,22 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  bool isShowUsers = false;
   late Future<QuerySnapshot<Object>>? _users;
   TextEditingController _searchController = TextEditingController();
-  UserModel user;
 
   clearSearch() {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _searchController.clear());
     setState(() {
       _users = null;
-      ListTile();
     });
-  }
-
-  getData() async {
-    try {
-      userModel = await Repo.getUser(widget.currentUserId);
-      setState(() {});
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
-  }
-
-  void initState() {
-    super.initState();
-    getData();
   }
 
   buildUserTile(UserModel user) {
     return ListTile(
       leading: CircleAvatar(
-        radius: 20,
-        backgroundImage: NetworkImage(
-          user.photoUrl,
-        ),
-      ),
-      title: Text(
-        user.username,
-      ),
+          radius: 20, backgroundImage: NetworkImage(userModel!.photoUrl)),
+      title: Text(user.username),
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -78,11 +55,11 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         centerTitle: true,
         elevation: 0.5,
-        title: TextFormField(
+        title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 15),
-            hintText: 'Search User...',
+            hintText: 'Search Users...',
             hintStyle: TextStyle(color: Colors.white),
             border: InputBorder.none,
             prefixIcon: Icon(Icons.search, color: Colors.white),
@@ -92,47 +69,56 @@ class _SearchScreenState extends State<SearchScreen> {
                 color: Colors.white,
               ),
               onPressed: () {
-                clearSearch();
+                // clearSearch();
               },
             ),
             filled: true,
           ),
-          onFieldSubmitted: (_) => setState(() => isShowUsers = true),
+          onChanged: (input) {
+            if (input.isNotEmpty) {
+              setState(() {
+                _users = DatabaseMethods.searchUsers(input);
+              });
+            }
+          },
         ),
       ),
-      body: isShowUsers
-          ? FutureBuilder(
-              future: FirebaseFirestore.instance
-                  .collection('users')
-                  .where('username',
-                      isGreaterThanOrEqualTo: _searchController.text)
-                  .get(),
-              builder: (context, snapshot) {
+      body: _users == null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Search Users...',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
+                  )
+                ],
+              ),
+            )
+          : FutureBuilder(
+              future: _users,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
-                    child: Container(),
+                    child: CircularProgressIndicator(),
                   );
                 }
-
+                if (snapshot.data.documents.length == 0) {
+                  return Center(
+                    child: Text('No users found'),
+                  );
+                }
                 return ListView.builder(
-                  itemCount: (snapshot.data! as dynamic).docs.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () => buildUserTile(user),
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          (snapshot.data! as dynamic).docs[index]['photoUrl'],
-                        ),
-                      ),
-                      title: Text(
-                        (snapshot.data! as dynamic).docs[index]['username'],
-                      ),
+                  itemCount: snapshot.data.documents.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    UserModel user = UserModel.fromSnap(
+                      snapshot.data.documents[index],
                     );
+                    return buildUserTile(user);
                   },
                 );
               },
-            )
-          : Container(),
+            ),
     );
   }
 }
