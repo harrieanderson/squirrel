@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:html';
 import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
@@ -28,11 +29,10 @@ class ProfilePageUi extends StatefulWidget {
 }
 
 class _ProfilePageUiState extends State<ProfilePageUi> {
-  late var _isLoggedOnUser =
-      userModel!.uid == FirebaseAuth.instance.currentUser;
+  late final _isOwnProfilePage = widget.visitedUserId == widget.uid;
   Uint8List? _image;
 
-  UserModel? userModel;
+  UserModel userModel = UserModel.fromDoc(snapshot.data);
 
   List<Post> _allPosts = [];
 
@@ -43,7 +43,11 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
         physics: AlwaysScrollableScrollPhysics(),
         itemCount: _allPosts.length,
         itemBuilder: (context, index) {
-          return PostContainer(post: _allPosts[index], author: author);
+          return PostContainer(
+            post: _allPosts[index],
+            author: author,
+            currentUserId: widget.uid,
+          );
         },
       ),
     );
@@ -71,7 +75,6 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
     super.initState();
     getAllPosts();
     getData();
-    getAllPosts();
   }
 
   // gets data from Firebase
@@ -105,22 +108,22 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
               Padding(
                 padding: EdgeInsets.all(_kAvatarPadding),
                 child: CircleAvatar(
-                  backgroundImage: NetworkImage(userModel!.photoUrl),
+                  backgroundImage: NetworkImage(userModel.photoUrl),
                   radius: _kAvatarRadius,
                 ),
               ),
               Column(
                 children: [
                   Text(
-                    userModel!.username,
+                    userModel.username,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
-                  Text(userModel!.bio)
+                  Text(userModel.bio)
                 ],
               ),
             ],
           ),
-          if (_isLoggedOnUser != true)
+          if (_isOwnProfilePage != true)
             Container()
           else
             Row(
@@ -178,7 +181,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
               Column(
                 children: [
                   Text(
-                    userModel!.culls.toString(),
+                    userModel.culls.toString(),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   Text(
@@ -195,7 +198,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
                   Column(
                     children: [
                       Text(
-                        userModel!.culls.toString(),
+                        userModel.culls.toString(),
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 20),
                       ),
@@ -214,7 +217,7 @@ class _ProfilePageUiState extends State<ProfilePageUi> {
             thickness: 1,
           ),
           showProfilePosts(
-            userModel!,
+            userModel,
           ),
         ],
       ),
